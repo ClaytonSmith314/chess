@@ -16,6 +16,8 @@ public class ChessPiece {
 
     private static final int[][] diagonals = {{1,1},{1,-1},{-1,1},{-1,-1}};
     private static final int[][] straights = {{1,0},{0,1},{0,-1},{-1,0}};
+    private static final int[][] knight_moves =
+            {{2,1},{1,2},{-2,1},{1,-2},{2,-1},{-1,2},{-1,-2},{-2,-1}};
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -75,6 +77,7 @@ public class ChessPiece {
                 add_line_moves(moves, board, myPosition, diagonals);
                 break;
             case KNIGHT:
+                add_list_moves(moves, board, myPosition, knight_moves);
                 break;
             case ROOK:
                 add_line_moves(moves, board, myPosition, straights);
