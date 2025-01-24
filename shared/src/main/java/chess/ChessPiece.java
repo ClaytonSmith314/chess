@@ -83,6 +83,7 @@ public class ChessPiece {
                 add_line_moves(moves, board, myPosition, straights);
                 break;
             case PAWN:
+                add_pawn_moves(moves, board, myPosition);
                 break;
             default:
                 System.out.println("Invalid piece type: "+type);
@@ -117,4 +118,50 @@ public class ChessPiece {
             }
         }
     }
+
+    private void add_pawn_moves(Collection<ChessMove> moves,
+                                ChessBoard board, ChessPosition myPosition) {
+        int direction = (pieceColor == ChessGame.TeamColor.WHITE ? 1 : -1);
+        ChessPosition targetPosition = myPosition.shifted(direction, 0);
+        if (targetPosition.inBounds()) {
+            ChessPiece otherPiece = board.getPiece(targetPosition);
+            if (otherPiece == null) {
+                add_pawn_move_with_promotion(moves, myPosition, targetPosition);
+                if(myPosition.getRow()==4.5-direction*2.5) {
+                    targetPosition = myPosition.shifted(2*direction, 0);
+                    if(board.getPiece(targetPosition)==null)
+                        moves.add(new ChessMove(myPosition, targetPosition, null));
+                }
+            }
+        }
+        for(int side=-1; side<=1; side+=2) {
+            targetPosition = myPosition.shifted(direction, side);
+            if (targetPosition.inBounds()) {
+                ChessPiece otherPiece = board.getPiece(targetPosition);
+                if (otherPiece != null && otherPiece.getTeamColor() != pieceColor) {
+                    add_pawn_move_with_promotion(moves, myPosition, targetPosition);
+                }
+            }
+        }
+    }
+    private void add_pawn_move_with_promotion(Collection<ChessMove> moves, ChessPosition myPosition,
+                                              ChessPosition targetPosition) {
+        if(targetPosition.getRow()==1 || targetPosition.getRow()==8) {
+            for(PieceType pieceType : PieceType.values()) {
+                if (pieceType==PieceType.PAWN || pieceType==PieceType.KING) continue;
+                moves.add(new ChessMove(myPosition, targetPosition, pieceType));
+            }
+        } else moves.add(new ChessMove(myPosition, targetPosition, null));
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
