@@ -14,12 +14,17 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
 
-    private static int[][] diagonals = {{1,1},{1,-1},{-1,1},{-1,-1}};
-    private static int[][] straghts = {{1,0},{0,1},{0,-1},{-1,0}};
+    private static final int[][] diagonals = {{1,1},{1,-1},{-1,1},{-1,-1}};
+    private static final int[][] straights = {{1,0},{0,1},{0,-1},{-1,0}};
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "";
     }
 
     /**
@@ -59,6 +64,8 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
         switch (type) {
             case KING:
+                add_list_moves(moves, board, myPosition, diagonals);
+                add_list_moves(moves, board, myPosition, straights);
                 break;
             case QUEEN:
                 break;
@@ -74,21 +81,22 @@ public class ChessPiece {
                 System.out.println("Invalid piece type: "+type);
                 break;
         }
-        return null;
+        return moves;
     }
 
     private void add_list_moves(Collection<ChessMove> moves, ChessBoard board,
-                                ChessPosition myPosition, int[][] move_differences) {
-        for(int i=0; i<move_differences.length; i++){
-            ChessPosition targetPosition = myPosition.shifted(move_differences[i][0], move_differences[i][1]);
+                                ChessPosition myPosition, int[][] moveDifferences) {
+        for (int[] moveDifference : moveDifferences) {
+            ChessPosition targetPosition = myPosition.shifted(moveDifference[0], moveDifference[1]);
             if (targetPosition.inBounds()) {
                 ChessPiece otherPiece = board.getPiece(targetPosition);
-                if (otherPiece==null || otherPiece.getTeamColor() != pieceColor) {
-                    moves.add(new ChessMove(myPosition, targetPosition, type));
+                if (otherPiece == null || otherPiece.getTeamColor() != pieceColor) {
+                    moves.add(new ChessMove(myPosition, targetPosition, null));
                 }
             }
         }
     }
+
     private void add_line_moves(Collection<ChessMove> pieceMoves, ChessBoard board,
                                 ChessPosition position, int[][] move_deltas) {
         return;
