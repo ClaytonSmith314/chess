@@ -40,6 +40,59 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        for(int i=0; i<8; i++)
+            for (int j = 0; j < 8; j++)
+                chess_board_array[i][j] = null;
+        for(int col=0; col<8; col++) {
+            chess_board_array[1][col] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            chess_board_array[6][col] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+        }
+        add_opposing_pieces(0, ChessPiece.PieceType.ROOK);
+        add_opposing_pieces(1, ChessPiece.PieceType.KNIGHT);
+        add_opposing_pieces(2, ChessPiece.PieceType.BISHOP);
+        add_opposing_pieces(3, ChessPiece.PieceType.QUEEN);
+        add_opposing_pieces(4, ChessPiece.PieceType.KING);
+        add_opposing_pieces(5, ChessPiece.PieceType.BISHOP);
+        add_opposing_pieces(6, ChessPiece.PieceType.KNIGHT);
+        add_opposing_pieces(7, ChessPiece.PieceType.ROOK);
     }
+    private void add_opposing_pieces(int col, ChessPiece.PieceType type) {
+        chess_board_array[0][col] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
+        chess_board_array[7][col] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ChessBoard other) {
+            for(int i=1; i<=8; i++) {
+                for (int j = 1; j <= 8; j++) {
+                    ChessPosition position = new ChessPosition(i, j);
+                    ChessPiece piece = getPiece(position);
+                    ChessPiece otherPiece = other.getPiece(position);
+                    if (piece==null && otherPiece!=null) return false;
+                    if (piece!=null && otherPiece==null) return false;
+                    if (piece!=null && !piece.equals(otherPiece)) return false;
+                }
+            }
+            return true;
+        } else return false;
+    }
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        for(int i=1; i<=8; i++) {
+            s.append("\n");
+            for(int j=1; j<=8; j++) {
+                s.append(getPiece(new ChessPosition(i, j))).append("\t");
+            }
+        }
+        return s.toString();
+    }
+
 }
+
+
+
+
+

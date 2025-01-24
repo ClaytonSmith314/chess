@@ -26,7 +26,13 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return "";
+        return (pieceColor==ChessGame.TeamColor.BLACK?"b":"w")+type;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ChessPiece other) {
+            return (getTeamColor()==other.getTeamColor()) && (getPieceType()==other.getPieceType());
+        } else return false;
     }
 
     /**
