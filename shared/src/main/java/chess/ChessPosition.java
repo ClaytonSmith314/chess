@@ -31,4 +31,19 @@ public class ChessPosition {
     public int getColumn() {
         return col;
     }
+
+    /**
+     * @return a bool indicating whether the position is inside the chessboard or not
+     */
+    public boolean inBounds() {
+        return row >= 1 && col >= 1
+                && row <= 8 && col <= 8;
+    }
+
+    /**
+     * @return a new ChessPosition with row shifted by dx and col shifted by dy
+     */
+    public ChessPosition shifted(int dx, int dy) {
+        return new ChessPosition(row + dx, col + dy);
+    }
 }

@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -12,6 +13,9 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
+
+    private static int[][] diagonals = {{1,1},{1,-1},{-1,1},{-1,-1}};
+    private static int[][] straghts = {{1,0},{0,1},{0,-1},{-1,0}};
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
@@ -52,6 +56,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
         switch (type) {
             case KING:
                 break;
@@ -70,5 +75,22 @@ public class ChessPiece {
                 break;
         }
         return null;
+    }
+
+    private void add_list_moves(Collection<ChessMove> moves, ChessBoard board,
+                                ChessPosition myPosition, int[][] move_differences) {
+        for(int i=0; i<move_differences.length; i++){
+            ChessPosition targetPosition = myPosition.shifted(move_differences[i][0], move_differences[i][1]);
+            if (targetPosition.inBounds()) {
+                ChessPiece otherPiece = board.getPiece(targetPosition);
+                if (otherPiece==null || otherPiece.getTeamColor() != pieceColor) {
+                    moves.add(new ChessMove(myPosition, targetPosition, type));
+                }
+            }
+        }
+    }
+    private void add_line_moves(Collection<ChessMove> pieceMoves, ChessBoard board,
+                                ChessPosition position, int[][] move_deltas) {
+        return;
     }
 }
