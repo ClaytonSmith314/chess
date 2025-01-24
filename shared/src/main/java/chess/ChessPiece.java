@@ -70,7 +70,7 @@ public class ChessPiece {
             case QUEEN:
                 break;
             case BISHOP:
-                break;
+                add_line_moves(moves, board, myPosition, diagonals);
             case KNIGHT:
                 break;
             case ROOK:
@@ -97,8 +97,17 @@ public class ChessPiece {
         }
     }
 
-    private void add_line_moves(Collection<ChessMove> pieceMoves, ChessBoard board,
-                                ChessPosition position, int[][] move_deltas) {
-        return;
+    private void add_line_moves(Collection<ChessMove> moves, ChessBoard board,
+                                ChessPosition myPosition, int[][] moveDeltas) {
+        for (int[] moveDelta : moveDeltas) {
+            for (int i=1; i<=8; i++) {
+                ChessPosition targetPosition = myPosition.shifted(i*moveDelta[0], i*moveDelta[1]);
+                if (!targetPosition.inBounds()) break;
+                ChessPiece otherPiece = board.getPiece(targetPosition);
+                if (otherPiece!=null && otherPiece.getTeamColor()==pieceColor) break;
+                moves.add(new ChessMove(myPosition, targetPosition, null));
+                if (otherPiece!=null && otherPiece.getTeamColor()!=pieceColor) break;
+            }
+        }
     }
 }
