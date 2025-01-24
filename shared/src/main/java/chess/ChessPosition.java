@@ -8,8 +8,8 @@ package chess;
  */
 public class ChessPosition {
 
-    private int row;
-    private int col;
+    private final int row;
+    private final int col;
 
     public ChessPosition(int row, int col) {
         this.row = row;
@@ -45,5 +45,22 @@ public class ChessPosition {
      */
     public ChessPosition shifted(int dx, int dy) {
         return new ChessPosition(row + dx, col + dy);
+    }
+
+    @Override
+    public String toString() {
+        return "("+row+","+col+")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof ChessPosition other) {
+            return row == other.getRow() && col == other.getColumn();
+        } else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return 8*row + col;
     }
 }
