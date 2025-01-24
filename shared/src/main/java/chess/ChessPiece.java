@@ -68,12 +68,16 @@ public class ChessPiece {
                 add_list_moves(moves, board, myPosition, straights);
                 break;
             case QUEEN:
+                add_line_moves(moves, board, myPosition, diagonals);
+                add_line_moves(moves, board, myPosition, straights);
                 break;
             case BISHOP:
                 add_line_moves(moves, board, myPosition, diagonals);
+                break;
             case KNIGHT:
                 break;
             case ROOK:
+                add_line_moves(moves, board, myPosition, straights);
                 break;
             case PAWN:
                 break;
