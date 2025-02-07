@@ -13,6 +13,9 @@ public class ChessGame {
     private ChessBoard board;
     private TeamColor teamTurn;
 
+    private ChessPosition white_king_position;
+    private ChessPosition black_king_position;
+
     public ChessGame() {
 
     }
@@ -59,7 +62,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> valid_moves = validMoves(move.getStartPosition());
+        
     }
 
     /**
@@ -99,7 +103,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -108,6 +112,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
     }
 }
