@@ -29,13 +29,13 @@ public class ChessGame {
     }
 
     private void find_kings() {
-        for(int i=1; i<=8; i++) {
-            for(int j=1; j<=8; j++) {
-                ChessPosition pos = new ChessPosition(i,j);
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
+                ChessPosition pos = new ChessPosition(i, j);
                 ChessPiece piece = board.getPiece(pos);
-                if(piece!=null && piece.getPieceType()== ChessPiece.PieceType.KING) {
-                    if(piece.getTeamColor()==TeamColor.WHITE) white_king_position=pos;
-                    else black_king_position=pos;
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    if (piece.getTeamColor() == TeamColor.WHITE) white_king_position = pos;
+                    else black_king_position = pos;
                 }
             }
         }
@@ -84,9 +84,15 @@ public class ChessGame {
         ChessPiece piece = board.getPiece(startPosition);
         if(piece==null) return null;
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-
-
-
+        ChessBoard board_save = board.copy();
+        for(ChessMove move: new ArrayList<ChessMove>(moves)) {
+            ChessBoard save_board = board.copy();
+            board.addPiece(move.getStartPosition(), null);
+            board.addPiece(move.getEndPosition(), piece);
+            find_kings();
+            if (isInCheck(piece.getTeamColor())) moves.remove(move);
+            board = save_board;
+        }
         return moves;
     }
 
