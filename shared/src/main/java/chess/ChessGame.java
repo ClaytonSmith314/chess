@@ -106,9 +106,13 @@ public class ChessGame {
         Collection<ChessMove> valid_moves = validMoves(move.getStartPosition());
         if (valid_moves!=null && valid_moves.contains(move)) {
             ChessPiece piece = board.getPiece(move.getStartPosition());
+            if(piece.getTeamColor()!=teamTurn) throw new InvalidMoveException();
             board.addPiece(move.getStartPosition(), null);
-            board.addPiece(move.getEndPosition(), piece);
+            ChessPiece.PieceType promotion = move.getPromotionPiece();
+            if(promotion==null) board.addPiece(move.getEndPosition(), piece);
+            else board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), promotion));
             find_kings();
+            teamTurn = (teamTurn==TeamColor.WHITE)? TeamColor.BLACK : TeamColor.WHITE;
         } else {
             throw new InvalidMoveException(); //"Move "+valid_moves.toString()+" is invalid");
         }
