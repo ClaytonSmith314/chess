@@ -27,16 +27,26 @@ public class ChessGame {
         }
         return positions;
     }
-//
-//    private Collection<ChessPosition> getAllMoves(TeamColor team) {
-//        for(int i=1; i<=8; i++) {
-//
-//        }
-//    }
+
+    private void find_kings() {
+        for(int i=1; i<=8; i++) {
+            for(int j=1; j<=8; j++) {
+                ChessPosition pos = new ChessPosition(i,j);
+                ChessPiece piece = board.getPiece(pos);
+                if(piece!=null && piece.getPieceType()== ChessPiece.PieceType.KING) {
+                    if(piece.getTeamColor()==TeamColor.WHITE) white_king_position=pos;
+                    else black_king_position=pos;
+                }
+            }
+        }
+    }
 
 
     public ChessGame() {
-
+        board = new ChessBoard();
+        board.resetBoard();
+        teamTurn = TeamColor.WHITE;
+        find_kings();
     }
 
     /**
@@ -92,6 +102,7 @@ public class ChessGame {
             ChessPiece piece = board.getPiece(move.getStartPosition());
             board.addPiece(move.getStartPosition(), null);
             board.addPiece(move.getEndPosition(), piece);
+            find_kings();
         } else {
             throw new InvalidMoveException(); //"Move "+valid_moves.toString()+" is invalid");
         }
@@ -104,7 +115,20 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        TeamColor otherColor = (teamColor==TeamColor.WHITE)? TeamColor.BLACK : TeamColor.WHITE;
+        ChessPosition king_position = (teamColor==TeamColor.WHITE)? white_king_position : black_king_position;
+        for(int i=1; i<=8; i++) {
+            for(int j=1; j<=8; j++) {
+                ChessPosition pos = new ChessPosition(i,j);
+                ChessPiece piece = board.getPiece(pos);
+                if(piece!=null && piece.getTeamColor()==otherColor) {
+                    if(getEndPosition(piece.pieceMoves(board, pos)).contains(king_position)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -135,6 +159,7 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+        find_kings();
     }
 
     /**
