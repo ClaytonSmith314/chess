@@ -1,6 +1,9 @@
 package chess;
 
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -11,10 +14,26 @@ import java.util.Collection;
 public class ChessGame {
 
     private ChessBoard board;
+    
     private TeamColor teamTurn;
 
     private ChessPosition white_king_position;
     private ChessPosition black_king_position;
+
+    private Collection<ChessPosition> getEndPosition(Collection<ChessMove> moves) {
+        Collection<ChessPosition> positions = new ArrayList<ChessPosition>();
+        for(ChessMove move: moves) {
+            positions.add(move.getEndPosition());
+        }
+        return positions;
+    }
+//
+//    private Collection<ChessPosition> getAllMoves(TeamColor team) {
+//        for(int i=1; i<=8; i++) {
+//
+//        }
+//    }
+
 
     public ChessGame() {
 
@@ -52,7 +71,13 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        if(piece==null) return null;
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+
+
+
+        return moves;
     }
 
     /**
@@ -63,7 +88,13 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> valid_moves = validMoves(move.getStartPosition());
-        
+        if (valid_moves!=null && valid_moves.contains(move)) {
+            ChessPiece piece = board.getPiece(move.getStartPosition());
+            board.addPiece(move.getStartPosition(), null);
+            board.addPiece(move.getEndPosition(), piece);
+        } else {
+            throw new InvalidMoveException(); //"Move "+valid_moves.toString()+" is invalid");
+        }
     }
 
     /**
