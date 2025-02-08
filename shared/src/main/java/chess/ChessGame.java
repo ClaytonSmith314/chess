@@ -93,6 +93,7 @@ public class ChessGame {
             if (isInCheck(piece.getTeamColor())) moves.remove(move);
             board = save_board;
         }
+        find_kings();
         return moves;
     }
 
@@ -114,7 +115,7 @@ public class ChessGame {
             find_kings();
             teamTurn = (teamTurn==TeamColor.WHITE)? TeamColor.BLACK : TeamColor.WHITE;
         } else {
-            throw new InvalidMoveException(); //"Move "+valid_moves.toString()+" is invalid");
+            throw new InvalidMoveException();
         }
     }
 
@@ -149,7 +150,19 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         ChessPosition king_position = (teamColor==TeamColor.WHITE)? white_king_position : black_king_position;
-        return validMoves(king_position).isEmpty() && isInCheck(teamColor);
+        if(validMoves(king_position).isEmpty() && isInCheck(teamColor)) {
+            for(int i=1; i<=8; i++) {
+                for(int j=1; j<=8; j++) {
+                    ChessPosition pos = new ChessPosition(i,j);
+                    ChessPiece piece = board.getPiece(pos);
+                    if(piece!=null && piece.getTeamColor()==teamColor) {
+                        if(!validMoves(pos).isEmpty()) return false;
+                    }
+                }
+            }
+            return true;
+        }
+        else return false;
     }
 
     /**
