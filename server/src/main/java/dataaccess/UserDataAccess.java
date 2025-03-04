@@ -5,8 +5,6 @@ import java.util.Collection;
 
 import model.UserData;
 
-import javax.xml.crypto.Data;
-
 public class UserDataAccess {
 
     private Collection<UserData> userDataBase = new ArrayList<UserData>();
