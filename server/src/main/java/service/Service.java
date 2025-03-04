@@ -12,31 +12,31 @@ import java.util.Collection;
 
 public class Service {
 
-    public void clear(){
+    public void clear() throws DataAccessException{
 
     }
 
-    public AuthData register(UserData userData){
+    public AuthData register(UserData userData) throws DataAccessException{
         return new AuthData("","");
     }
 
-    public AuthData login(LoginData loginData){
+    public AuthData login(LoginData loginData) throws DataAccessException{
         return new AuthData("","");
     }
 
-    public void logout(String authToken){
+    public void logout(String authToken) throws DataAccessException{
 
     }
 
-    public Collection<GameData> listGames(String authToken){
+    public Collection<GameData> listGames(String authToken) throws DataAccessException{
         return new ArrayList<GameData>();
     }
 
-    public GameId createGame(String authToken, GameName name){
+    public GameId createGame(String authToken, GameName name) throws DataAccessException{
         return new GameId(0);
     }
 
-    public void joinGame(String authToken, JoinGameData joinGameData) {
+    public void joinGame(String authToken, JoinGameData joinGameData) throws DataAccessException{
     }
 
 }
