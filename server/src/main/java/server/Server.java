@@ -16,20 +16,16 @@ public class Server {
 
         // Register your endpoints and clear exceptions here.
 
-        Spark.delete("/db", (req,res)-> handler.clear(req,res));
+        Spark.delete("/db", (req,res)-> handler.handleClear(req,res));
 
-        Spark.post("/user", (req,res)-> handler.register(req,res));
+        Spark.post("/user", (req,res)-> handler.handleRegister(req,res));
 
-        Spark.post("/session", (req,res)->handler.login(req,res));
-        Spark.delete("/session", (req,res)->handler.logout(req,res));
+        Spark.post("/session", (req,res)->handler.handleLogin(req,res));
+        Spark.delete("/session", (req,res)->handler.handleLogout(req,res));
 
-        Spark.get("/game", (req,res)->handler.listGames(req,res));
-        Spark.post("/game", (req,res)->handler.createGame(req,res));
-        Spark.put("/game", (req,res)->handler.joinGame(req,res));
-
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
-        Spark.init();
+        Spark.get("/game", (req,res)->handler.handleListGames(req,res));
+        Spark.post("/game", (req,res)->handler.handleCreateGame(req,res));
+        Spark.put("/game", (req,res)->handler.handleJoinGame(req,res));
 
         Spark.awaitInitialization();
         return Spark.port();
