@@ -12,7 +12,7 @@ public class MemoryAuthDAO implements AuthDAO {
 
     public void addAuth(AuthData authData) throws DataAccessException {
         for(var other: authDataBase) {
-            if (other.username().equals(authData.username())) {
+            if (other.authToken().equals(authData.authToken())) {
                 throw new DataAccessException("Error: already taken");
             }
         }

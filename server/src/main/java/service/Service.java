@@ -3,10 +3,6 @@ package service;
 import dataaccess.DataAccessException;
 import model.*;
 
-import spark.Request;
-import spark.Response;
-
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -32,7 +28,14 @@ public class Service {
     }
 
     public AuthData login(LoginData loginData) throws DataAccessException {
-        return new AuthData("","");
+        UserData userData = userDAO.getUser(loginData.username());
+        if (!userData.password().equals(loginData.password())) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        String authToken = generateAuthToken();
+        AuthData authData = new AuthData(authToken, userData.username());
+        authDAO.addAuth(authData);
+        return authData;
     }
 
     public void logout(String authToken) throws DataAccessException{
