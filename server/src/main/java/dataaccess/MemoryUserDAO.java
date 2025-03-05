@@ -5,11 +5,11 @@ import java.util.Collection;
 
 import model.UserData;
 
-public class UserDataAccess {
+public class MemoryUserDAO implements UserDAO {
 
     private Collection<UserData> userDataBase = new ArrayList<UserData>();
 
-    void addUser(UserData userData) throws DataAccessException{
+    public void addUser(UserData userData) throws DataAccessException{
         for(var other: userDataBase) {
             if (other.username().equals(userData.username())) {
                 throw new DataAccessException("Error: already taken");
@@ -18,7 +18,7 @@ public class UserDataAccess {
         userDataBase.add(userData);
     }
 
-    UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) throws DataAccessException {
         for (var userData : userDataBase) {
             if (userData.username().equals(username)) {
                 return userData;
@@ -27,11 +27,23 @@ public class UserDataAccess {
         throw new DataAccessException("Error: unauthorized"); //TODO: unauthorized or incorrect username?
     }
 
-    void deleteUser(UserData userData) {
+    public void updateUser(UserData userData) throws DataAccessException {
+        for (var other : userDataBase) {
+            if (userData.username().equals(userData.username())) {
+
+            }
+        }
+    }
+
+    public void removeUser(UserData userData) {
         userDataBase.remove(userData);
     }
 
-    void clearAllUsers() {
+    public Collection<UserData> listUsers() {
+        return new ArrayList<UserData>(userDataBase);
+    }
+
+    public void clearUsers() {
         userDataBase = new ArrayList<UserData>();
     }
 
