@@ -39,7 +39,8 @@ public class Service {
     }
 
     public void logout(String authToken) throws DataAccessException{
-
+        AuthData authData = authDAO.getAuth(authToken);
+        authDAO.removeAuth(authData);
     }
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException{
