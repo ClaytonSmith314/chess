@@ -9,18 +9,29 @@ import spark.Response;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
+
+import dataaccess.*;
 
 public class Service {
+
+    private AuthDAO authDAO = new MemoryAuthDAO();
+    private GameDAO gameDAO = new MemoryGameDAO();
+    private UserDAO userDAO = new MemoryUserDAO();
 
     public void clear() throws DataAccessException{
 
     }
 
     public AuthData register(UserData userData) throws DataAccessException{
-        return new AuthData("","");
+        userDAO.addUser(userData);
+        String authToken = generateAuthToken();
+        AuthData authData = new AuthData(authToken, userData.username());
+        authDAO.addAuth(authData);
+        return authData;
     }
 
-    public AuthData login(LoginData loginData) throws DataAccessException{
+    public AuthData login(LoginData loginData) throws DataAccessException {
         return new AuthData("","");
     }
 
@@ -37,6 +48,10 @@ public class Service {
     }
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws DataAccessException{
+    }
+
+    public static String generateAuthToken() {
+        return UUID.randomUUID().toString();
     }
 
 }
