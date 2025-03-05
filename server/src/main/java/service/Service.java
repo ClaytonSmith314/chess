@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccessException;
 import model.*;
+import chess.ChessGame;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,15 +48,26 @@ public class Service {
         return new ArrayList<GameData>();
     }
 
-    public GameId createGame(String authToken, GameName name) throws DataAccessException{
-        return new GameId(0);
+    public GameId createGame(String authToken, GameName gameName) throws DataAccessException{
+        AuthData authData = authDAO.getAuth(authToken);
+        int gameId = generateGameId();
+        ChessGame chessGame = new ChessGame();
+        GameData gameData = new GameData(gameId, null, null, gameName.gameName(), chessGame);
+        gameDAO.addGame(gameData);
+        return new GameId(gameId);
     }
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws DataAccessException{
     }
 
-    public static String generateAuthToken() {
+    private static String generateAuthToken() {
         return UUID.randomUUID().toString();
+    }
+
+    private static int nextGameId = 0;
+    private static int generateGameId() {
+        nextGameId += 1;
+        return nextGameId;
     }
 
 }
