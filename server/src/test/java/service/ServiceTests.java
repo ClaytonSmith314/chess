@@ -255,12 +255,12 @@ public class ServiceTests {
 
         var gamesList = service.listGames(authData.authToken());
 
-        Assertions.assertEquals(3, gamesList.size());
+        Assertions.assertEquals(3, gamesList.games().size());
 
         boolean gameListContainsId1 = false;
         boolean gameListContainsId2 = false;
         boolean gameListContainsId3 = false;
-        for(var gameData : gamesList) {
+        for(var gameData : gamesList.games()) {
             if(gameData.gameID() == gameId1.gameID()) gameListContainsId1 = true;
             if(gameData.gameID() == gameId2.gameID()) gameListContainsId2 = true;
             if(gameData.gameID() == gameId3.gameID()) gameListContainsId3 = true;
@@ -330,7 +330,7 @@ public class ServiceTests {
 
         var gamesList = service.listGames(newAuthData.authToken());
 
-        Assertions.assertTrue(gamesList.isEmpty());
+        Assertions.assertTrue(gamesList.games().isEmpty());
     }
 
 }

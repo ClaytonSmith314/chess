@@ -19,7 +19,9 @@ public class Service {
     private UserDAO userDAO = new MemoryUserDAO();
 
     public void clear() throws DataAccessException{
-
+        authDAO.clearAuth();
+        gameDAO.clearGames();
+        userDAO.clearUsers();
     }
 
     public AuthData register(UserData userData) throws DataAccessException{
@@ -48,8 +50,9 @@ public class Service {
         authDAO.removeAuth(authData);
     }
 
-    public Collection<GameData> listGames(String authToken) throws DataAccessException{
-        return new ArrayList<GameData>();
+    public GamesList listGames(String authToken) throws DataAccessException{
+        authDAO.getAuth(authToken);
+        return new GamesList(gameDAO.listGames());
     }
 
     public GameId createGame(String authToken, GameName gameName) throws DataAccessException{
@@ -62,6 +65,35 @@ public class Service {
     }
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws DataAccessException{
+        AuthData authData = authDAO.getAuth(authToken);
+        GameData gameData = gameDAO.getGame(joinGameData.gameID());
+        if(joinGameData.playerColor()==null)
+            throw new DataAccessException("Error: bad request");
+        if(joinGameData.playerColor().equals("WHITE")) {
+            if(!(gameData.whiteUsername()==null))
+                throw new DataAccessException("Error: already taken");
+            gameData = new GameData(
+                    gameData.gameID(),
+                    authData.username(),
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    gameData.game()
+            );
+            gameDAO.updateGame(gameData);
+        }
+        else if(joinGameData.playerColor().equals("BLACK")) {
+            if(!(gameData.blackUsername()==null))
+                throw new DataAccessException("Error: already taken");
+            gameData = new GameData(
+                    gameData.gameID(),
+                    gameData.whiteUsername(),
+                    authData.username(),
+                    gameData.gameName(),
+                    gameData.game()
+            );
+            gameDAO.updateGame(gameData);
+        }
+        else throw new DataAccessException("Error: bad request");
     }
 
     private static String generateAuthToken() {
