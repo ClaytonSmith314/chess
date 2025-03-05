@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import dataaccess.*;
 
+import javax.xml.crypto.Data;
+
 public class Service {
 
     private AuthDAO authDAO = new MemoryAuthDAO();
@@ -21,6 +23,8 @@ public class Service {
     }
 
     public AuthData register(UserData userData) throws DataAccessException{
+        if(userData.password()==null || userData.username()==null || userData.email()==null)
+            throw new DataAccessException("Error: bad request");
         userDAO.addUser(userData);
         String authToken = generateAuthToken();
         AuthData authData = new AuthData(authToken, userData.username());
