@@ -24,7 +24,7 @@ public class MemoryUserDAO implements UserDAO {
                 return userData;
             }
         }
-        throw new DataAccessException("Error: unauthorized"); //TODO: unauthorized or incorrect username?
+        throw new DataAccessException("Error: unauthorized");
     }
 
     public void clearUsers() {

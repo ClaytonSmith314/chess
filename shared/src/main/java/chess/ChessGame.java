@@ -33,7 +33,7 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(pos);
                 if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING) {
                     if (piece.getTeamColor() == TeamColor.WHITE) { whiteKingPosition = pos; }
-                    else blackKingPosition = pos;
+                    else { blackKingPosition = pos; }
                 }
             }
         }
@@ -110,8 +110,9 @@ public class ChessGame {
             ChessPiece.PieceType promotion = move.getPromotionPiece();
             if(promotion==null) {
                 board.addPiece(move.getEndPosition(), piece);
+            } else {
+                board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), promotion));
             }
-            else board.addPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(), promotion));
             findKings();
             teamTurn = (teamTurn==TeamColor.WHITE)? TeamColor.BLACK : TeamColor.WHITE;
         } else {

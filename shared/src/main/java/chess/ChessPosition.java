@@ -56,7 +56,9 @@ public class ChessPosition {
     public boolean equals(Object o) {
         if(o instanceof ChessPosition other) {
             return row == other.getRow() && col == other.getColumn();
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
     @Override

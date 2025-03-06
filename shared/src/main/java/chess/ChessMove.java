@@ -55,15 +55,18 @@ public class ChessMove {
 
             if(startPosition.equals(move.getStartPosition())
                     && endPosition.equals(move.getEndPosition())) {
-                if (promotionPiece == move.getPromotionPiece()) return true;
-                else return false;
-            } else return false;
-        } else return false;
+                if (promotionPiece == move.getPromotionPiece()) { return true; }
+                else { return false; }
+            } else { return false; }
+        } else { return false; }
     }
 
     @Override
     public int hashCode() {
-        if (promotionPiece == null) return startPosition.hashCode() + 64*endPosition.hashCode();
-        else return startPosition.hashCode() + 64*endPosition.hashCode() + 64*64*promotionPiece.hashCode();
+        if (promotionPiece == null) {
+            return startPosition.hashCode() + 64*endPosition.hashCode();
+        } else {
+            return startPosition.hashCode() + 64*endPosition.hashCode() + 64*64*promotionPiece.hashCode();
+        }
     }
 }

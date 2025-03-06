@@ -32,7 +32,9 @@ public class ChessPiece {
     public boolean equals(Object obj) {
         if (obj instanceof ChessPiece other) {
             return (getTeamColor()==other.getTeamColor()) && (getPieceType()==other.getPieceType());
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -116,11 +118,11 @@ public class ChessPiece {
         for (int[] moveDelta : moveDeltas) {
             for (int i=1; i<=8; i++) {
                 ChessPosition targetPosition = myPosition.shifted(i*moveDelta[0], i*moveDelta[1]);
-                if (!targetPosition.inBounds()) break;
+                if (!targetPosition.inBounds()) { break; }
                 ChessPiece otherPiece = board.getPiece(targetPosition);
-                if (otherPiece!=null && otherPiece.getTeamColor()==pieceColor) break;
+                if (otherPiece!=null && otherPiece.getTeamColor()==pieceColor) { break; }
                 moves.add(new ChessMove(myPosition, targetPosition, null));
-                if (otherPiece!=null && otherPiece.getTeamColor()!=pieceColor) break;
+                if (otherPiece!=null && otherPiece.getTeamColor()!=pieceColor) { break; }
             }
         }
     }
@@ -135,8 +137,9 @@ public class ChessPiece {
                 addPawnMoveWithPromotion(moves, myPosition, targetPosition);
                 if(myPosition.getRow()==4.5-direction*2.5) {
                     targetPosition = myPosition.shifted(2*direction, 0);
-                    if(board.getPiece(targetPosition)==null)
+                    if(board.getPiece(targetPosition)==null) {
                         moves.add(new ChessMove(myPosition, targetPosition, null));
+                    }
                 }
             }
         }
@@ -154,10 +157,12 @@ public class ChessPiece {
                                               ChessPosition targetPosition) {
         if(targetPosition.getRow()==1 || targetPosition.getRow()==8) {
             for(PieceType pieceType : PieceType.values()) {
-                if (pieceType==PieceType.PAWN || pieceType==PieceType.KING) continue;
+                if (pieceType==PieceType.PAWN || pieceType==PieceType.KING) { continue; }
                 moves.add(new ChessMove(myPosition, targetPosition, pieceType));
             }
-        } else moves.add(new ChessMove(myPosition, targetPosition, null));
+        } else {
+            moves.add(new ChessMove(myPosition, targetPosition, null));
+        }
     }
 }
 

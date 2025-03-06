@@ -40,9 +40,11 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        for(int i=0; i<8; i++)
-            for (int j = 0; j < 8; j++)
+        for(int i=0; i<8; i++) {
+            for (int j = 0; j < 8; j++) {
                 chessBoardArray[i][j] = null;
+            }
+        }
         for(int col=0; col<8; col++) {
             chessBoardArray[1][col] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             chessBoardArray[6][col] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
@@ -70,13 +72,15 @@ public class ChessBoard {
                     ChessPosition position = new ChessPosition(i, j);
                     ChessPiece piece = getPiece(position);
                     ChessPiece otherPiece = other.getPiece(position);
-                    if (piece==null && otherPiece!=null) return false;
-                    if (piece!=null && otherPiece==null) return false;
-                    if (piece!=null && !piece.equals(otherPiece)) return false;
+                    if (piece==null && otherPiece!=null) { return false; }
+                    if (piece!=null && otherPiece==null) { return false; }
+                    if (piece!=null && !piece.equals(otherPiece)) { return false; }
                 }
             }
             return true;
-        } else return false;
+        } else {
+            return false;
+        }
     }
     @Override
     public String toString() {

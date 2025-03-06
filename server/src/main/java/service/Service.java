@@ -25,8 +25,9 @@ public class Service {
     }
 
     public AuthData register(UserData userData) throws DataAccessException{
-        if(userData.password()==null || userData.username()==null || userData.email()==null)
+        if(userData.password()==null || userData.username()==null || userData.email()==null) {
             throw new DataAccessException("Error: bad request");
+        }
         userDAO.addUser(userData);
         String authToken = generateAuthToken();
         AuthData authData = new AuthData(authToken, userData.username());
@@ -67,11 +68,13 @@ public class Service {
     public void joinGame(String authToken, JoinGameData joinGameData) throws DataAccessException{
         AuthData authData = authDAO.getAuth(authToken);
         GameData gameData = gameDAO.getGame(joinGameData.gameID());
-        if(joinGameData.playerColor()==null)
+        if(joinGameData.playerColor()==null) {
             throw new DataAccessException("Error: bad request");
+        }
         if(joinGameData.playerColor().equals("WHITE")) {
-            if(!(gameData.whiteUsername()==null))
+            if(!(gameData.whiteUsername()==null)) {
                 throw new DataAccessException("Error: already taken");
+            }
             gameData = new GameData(
                     gameData.gameID(),
                     authData.username(),
@@ -82,8 +85,9 @@ public class Service {
             gameDAO.updateGame(gameData);
         }
         else if(joinGameData.playerColor().equals("BLACK")) {
-            if(!(gameData.blackUsername()==null))
+            if(!(gameData.blackUsername()==null)) {
                 throw new DataAccessException("Error: already taken");
+            }
             gameData = new GameData(
                     gameData.gameID(),
                     gameData.whiteUsername(),
@@ -92,8 +96,9 @@ public class Service {
                     gameData.game()
             );
             gameDAO.updateGame(gameData);
+        } else {
+            throw new DataAccessException("Error: bad request");
         }
-        else throw new DataAccessException("Error: bad request");
     }
 
     private static String generateAuthToken() {
