@@ -8,7 +8,7 @@ package chess;
  */
 public class ChessBoard {
 
-    private ChessPiece[][] chess_board_array = new ChessPiece[8][8];
+    private ChessPiece[][] chessBoardArray = new ChessPiece[8][8];
 
     public ChessBoard() {
 
@@ -21,7 +21,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        chess_board_array[position.getRow()-1][position.getColumn()-1] = piece;
+        chessBoardArray[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -32,7 +32,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-            return chess_board_array[position.getRow()-1][position.getColumn()-1];
+            return chessBoardArray[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -42,23 +42,23 @@ public class ChessBoard {
     public void resetBoard() {
         for(int i=0; i<8; i++)
             for (int j = 0; j < 8; j++)
-                chess_board_array[i][j] = null;
+                chessBoardArray[i][j] = null;
         for(int col=0; col<8; col++) {
-            chess_board_array[1][col] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            chess_board_array[6][col] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            chessBoardArray[1][col] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            chessBoardArray[6][col] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
         }
-        add_opposing_pieces(0, ChessPiece.PieceType.ROOK);
-        add_opposing_pieces(1, ChessPiece.PieceType.KNIGHT);
-        add_opposing_pieces(2, ChessPiece.PieceType.BISHOP);
-        add_opposing_pieces(3, ChessPiece.PieceType.QUEEN);
-        add_opposing_pieces(4, ChessPiece.PieceType.KING);
-        add_opposing_pieces(5, ChessPiece.PieceType.BISHOP);
-        add_opposing_pieces(6, ChessPiece.PieceType.KNIGHT);
-        add_opposing_pieces(7, ChessPiece.PieceType.ROOK);
+        addOpposingPieces(0, ChessPiece.PieceType.ROOK);
+        addOpposingPieces(1, ChessPiece.PieceType.KNIGHT);
+        addOpposingPieces(2, ChessPiece.PieceType.BISHOP);
+        addOpposingPieces(3, ChessPiece.PieceType.QUEEN);
+        addOpposingPieces(4, ChessPiece.PieceType.KING);
+        addOpposingPieces(5, ChessPiece.PieceType.BISHOP);
+        addOpposingPieces(6, ChessPiece.PieceType.KNIGHT);
+        addOpposingPieces(7, ChessPiece.PieceType.ROOK);
     }
-    private void add_opposing_pieces(int col, ChessPiece.PieceType type) {
-        chess_board_array[0][col] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
-        chess_board_array[7][col] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
+    private void addOpposingPieces(int col, ChessPiece.PieceType type) {
+        chessBoardArray[0][col] = new ChessPiece(ChessGame.TeamColor.WHITE, type);
+        chessBoardArray[7][col] = new ChessPiece(ChessGame.TeamColor.BLACK, type);
     }
 
 

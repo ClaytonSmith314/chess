@@ -21,9 +21,7 @@ public class Handler {
             res.status(200);
             return "{}";
         } catch (DataAccessException dataAccessException) {
-            res.status(500);
-            res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
-            return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
+            return serializeException(res, dataAccessException);
         }
     }
 
@@ -34,14 +32,7 @@ public class Handler {
             res.status(200);
             return serializer.toJson(authData);
         } catch (DataAccessException dataAccessException) {
-            if(dataAccessException.getMessage().equals("Error: bad request"))
-                res.status(400);
-            else if(dataAccessException.getMessage().equals("Error: already taken"))
-                res.status(403);
-            else
-                res.status(500);
-            res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
-            return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
+            return serializeException(res, dataAccessException);
         }
     }
 
@@ -52,16 +43,7 @@ public class Handler {
             res.status(200);
             return serializer.toJson(authData);
         } catch (DataAccessException dataAccessException) {
-            if(dataAccessException.getMessage().equals("Error: bad request"))
-                res.status(400);
-            else if(dataAccessException.getMessage().equals("Error: unauthorized"))
-                res.status(401);
-            else if(dataAccessException.getMessage().equals("Error: already taken"))
-                res.status(403);
-            else
-                res.status(500);
-            res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
-            return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
+            return serializeException(res, dataAccessException);
         }
     }
 
@@ -72,12 +54,7 @@ public class Handler {
             res.status(200);
             return "{}";
         } catch (DataAccessException dataAccessException) {
-            if(dataAccessException.getMessage().equals("Error: unauthorized"))
-                res.status(401);
-            else
-                res.status(500);
-            res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
-            return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
+            return serializeException(res, dataAccessException);
         }
     }
 
@@ -88,12 +65,7 @@ public class Handler {
             res.status(200);
             return serializer.toJson(gameDataCollection);
         } catch (DataAccessException dataAccessException) {
-            if(dataAccessException.getMessage().equals("Error: unauthorized"))
-                res.status(401);
-            else
-                res.status(500);
-            res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
-            return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
+            return serializeException(res, dataAccessException);
         }
     }
 
@@ -104,16 +76,7 @@ public class Handler {
             var gameDataCollection = service.createGame(authToken, gameName);
             return serializer.toJson(gameDataCollection);
         } catch (DataAccessException dataAccessException) {
-            if(dataAccessException.getMessage().equals("Error: bad request"))
-                res.status(400);
-            else if(dataAccessException.getMessage().equals("Error: unauthorized"))
-                res.status(401);
-            else if(dataAccessException.getMessage().equals("Error: already taken"))
-                res.status(403);
-            else
-                res.status(500);
-            res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
-            return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
+            return serializeException(res, dataAccessException);
         }
     }
 
@@ -124,17 +87,21 @@ public class Handler {
             service.joinGame(authToken, joinGameData);
             return "{}";
         } catch (DataAccessException dataAccessException) {
-            if(dataAccessException.getMessage().equals("Error: bad request"))
-                res.status(400);
-            else if(dataAccessException.getMessage().equals("Error: unauthorized"))
-                res.status(401);
-            else if(dataAccessException.getMessage().equals("Error: already taken"))
-                res.status(403);
-            else
-                res.status(500);
-            res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
-            return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
+            return serializeException(res, dataAccessException);
         }
+    }
+
+    private String serializeException(Response res, DataAccessException dataAccessException) {
+        if(dataAccessException.getMessage().equals("Error: bad request"))
+            res.status(400);
+        else if(dataAccessException.getMessage().equals("Error: unauthorized"))
+            res.status(401);
+        else if(dataAccessException.getMessage().equals("Error: already taken"))
+            res.status(403);
+        else
+            res.status(500);
+        res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
+        return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
     }
 
 }

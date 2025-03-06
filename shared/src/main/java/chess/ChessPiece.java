@@ -14,9 +14,9 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
 
-    private static final int[][] diagonals = {{1,1},{1,-1},{-1,1},{-1,-1}};
-    private static final int[][] straights = {{1,0},{0,1},{0,-1},{-1,0}};
-    private static final int[][] knight_moves =
+    private static final int[][] DIAGONALS = {{1,1},{1,-1},{-1,1},{-1,-1}};
+    private static final int[][] STRAIGHTS = {{1,0},{0,1},{0,-1},{-1,0}};
+    private static final int[][] KNIGHT_MOVES =
             {{2,1},{1,2},{-2,1},{1,-2},{2,-1},{-1,2},{-1,-2},{-2,-1}};
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -72,24 +72,24 @@ public class ChessPiece {
         Collection<ChessMove> moves = new ArrayList<>();
         switch (type) {
             case KING:
-                add_list_moves(moves, board, myPosition, diagonals);
-                add_list_moves(moves, board, myPosition, straights);
+                addListMoves(moves, board, myPosition, DIAGONALS);
+                addListMoves(moves, board, myPosition, STRAIGHTS);
                 break;
             case QUEEN:
-                add_line_moves(moves, board, myPosition, diagonals);
-                add_line_moves(moves, board, myPosition, straights);
+                addLineMoves(moves, board, myPosition, DIAGONALS);
+                addLineMoves(moves, board, myPosition, STRAIGHTS);
                 break;
             case BISHOP:
-                add_line_moves(moves, board, myPosition, diagonals);
+                addLineMoves(moves, board, myPosition, DIAGONALS);
                 break;
             case KNIGHT:
-                add_list_moves(moves, board, myPosition, knight_moves);
+                addListMoves(moves, board, myPosition, KNIGHT_MOVES);
                 break;
             case ROOK:
-                add_line_moves(moves, board, myPosition, straights);
+                addLineMoves(moves, board, myPosition, STRAIGHTS);
                 break;
             case PAWN:
-                add_pawn_moves(moves, board, myPosition);
+                addPawnMoves(moves, board, myPosition);
                 break;
             default:
                 System.out.println("Invalid piece type: "+type);
@@ -98,7 +98,7 @@ public class ChessPiece {
         return moves;
     }
 
-    private void add_list_moves(Collection<ChessMove> moves, ChessBoard board,
+    private void addListMoves(Collection<ChessMove> moves, ChessBoard board,
                                 ChessPosition myPosition, int[][] moveDifferences) {
         for (int[] moveDifference : moveDifferences) {
             ChessPosition targetPosition = myPosition.shifted(moveDifference[0], moveDifference[1]);
@@ -111,7 +111,7 @@ public class ChessPiece {
         }
     }
 
-    private void add_line_moves(Collection<ChessMove> moves, ChessBoard board,
+    private void addLineMoves(Collection<ChessMove> moves, ChessBoard board,
                                 ChessPosition myPosition, int[][] moveDeltas) {
         for (int[] moveDelta : moveDeltas) {
             for (int i=1; i<=8; i++) {
@@ -125,14 +125,14 @@ public class ChessPiece {
         }
     }
 
-    private void add_pawn_moves(Collection<ChessMove> moves,
+    private void addPawnMoves(Collection<ChessMove> moves,
                                 ChessBoard board, ChessPosition myPosition) {
         int direction = (pieceColor == ChessGame.TeamColor.WHITE ? 1 : -1);
         ChessPosition targetPosition = myPosition.shifted(direction, 0);
         if (targetPosition.inBounds()) {
             ChessPiece otherPiece = board.getPiece(targetPosition);
             if (otherPiece == null) {
-                add_pawn_move_with_promotion(moves, myPosition, targetPosition);
+                addPawnMoveWithPromotion(moves, myPosition, targetPosition);
                 if(myPosition.getRow()==4.5-direction*2.5) {
                     targetPosition = myPosition.shifted(2*direction, 0);
                     if(board.getPiece(targetPosition)==null)
@@ -145,12 +145,12 @@ public class ChessPiece {
             if (targetPosition.inBounds()) {
                 ChessPiece otherPiece = board.getPiece(targetPosition);
                 if (otherPiece != null && otherPiece.getTeamColor() != pieceColor) {
-                    add_pawn_move_with_promotion(moves, myPosition, targetPosition);
+                    addPawnMoveWithPromotion(moves, myPosition, targetPosition);
                 }
             }
         }
     }
-    private void add_pawn_move_with_promotion(Collection<ChessMove> moves, ChessPosition myPosition,
+    private void addPawnMoveWithPromotion(Collection<ChessMove> moves, ChessPosition myPosition,
                                               ChessPosition targetPosition) {
         if(targetPosition.getRow()==1 || targetPosition.getRow()==8) {
             for(PieceType pieceType : PieceType.values()) {
