@@ -92,14 +92,15 @@ public class Handler {
     }
 
     private String serializeException(Response res, DataAccessException dataAccessException) {
-        if(dataAccessException.getMessage().equals("Error: bad request"))
+        if (dataAccessException.getMessage().equals("Error: bad request")) {
             res.status(400);
-        else if(dataAccessException.getMessage().equals("Error: unauthorized"))
+        } else if (dataAccessException.getMessage().equals("Error: unauthorized")) {
             res.status(401);
-        else if(dataAccessException.getMessage().equals("Error: already taken"))
+        } else if(dataAccessException.getMessage().equals("Error: already taken")) {
             res.status(403);
-        else
+        } else {
             res.status(500);
+        }
         res.body(serializer.toJson(new FailureResponse(dataAccessException.getMessage())));
         return serializer.toJson(new FailureResponse(dataAccessException.getMessage()));
     }

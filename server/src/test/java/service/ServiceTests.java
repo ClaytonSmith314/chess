@@ -261,9 +261,9 @@ public class ServiceTests {
         boolean gameListContainsId2 = false;
         boolean gameListContainsId3 = false;
         for(var gameData : gamesList.games()) {
-            if(gameData.gameID() == gameId1.gameID()) gameListContainsId1 = true;
-            if(gameData.gameID() == gameId2.gameID()) gameListContainsId2 = true;
-            if(gameData.gameID() == gameId3.gameID()) gameListContainsId3 = true;
+            if(gameData.gameID() == gameId1.gameID()) { gameListContainsId1 = true; }
+            if(gameData.gameID() == gameId2.gameID()) { gameListContainsId2 = true; }
+            if(gameData.gameID() == gameId3.gameID()) { gameListContainsId3 = true; }
         }
         Assertions.assertTrue(gameListContainsId1);
         Assertions.assertTrue(gameListContainsId2);
