@@ -32,9 +32,6 @@ public class MemoryAuthDAO implements AuthDAO {
         authDataBase.remove(authData);
     }
 
-    public Collection<AuthData> listAuth() {
-        return new ArrayList<AuthData>(authDataBase);
-    }
 
     public void clearAuth() {
         authDataBase = new ArrayList<AuthData>();

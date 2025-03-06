@@ -27,22 +27,6 @@ public class MemoryUserDAO implements UserDAO {
         throw new DataAccessException("Error: unauthorized"); //TODO: unauthorized or incorrect username?
     }
 
-    public void updateUser(UserData userData) throws DataAccessException {
-        for (var other : userDataBase) {
-            if (userData.username().equals(userData.username())) {
-
-            }
-        }
-    }
-
-    public void removeUser(UserData userData) {
-        userDataBase.remove(userData);
-    }
-
-    public Collection<UserData> listUsers() {
-        return new ArrayList<UserData>(userDataBase);
-    }
-
     public void clearUsers() {
         userDataBase = new ArrayList<UserData>();
     }

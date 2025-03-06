@@ -10,14 +10,14 @@ public class MemoryGameDAO implements GameDAO {
 
     private ArrayList<GameData> gameDataBase = new ArrayList<GameData>();
 
-    public void addGame(GameData GameData) throws DataAccessException{
+    public void addGame(GameData gameData) throws DataAccessException{
         for(var other: gameDataBase) {
-            if (other.gameName().equals(GameData.gameName())
-                ||other.gameID()==GameData.gameID()) {
+            if (other.gameName().equals(gameData.gameName())
+                ||other.gameID()==gameData.gameID()) {
                 throw new DataAccessException("Error: bad request");
             }
         }
-        gameDataBase.add(GameData);
+        gameDataBase.add(gameData);
     }
 
     public void updateGame(GameData gameData) throws DataAccessException{
@@ -38,10 +38,6 @@ public class MemoryGameDAO implements GameDAO {
             }
         }
         throw new DataAccessException("Error: bad request");
-    }
-    
-    public void removeGame(GameData gameData) {
-        gameDataBase.remove(gameData);
     }
 
     public Collection<GameData> listGames() {

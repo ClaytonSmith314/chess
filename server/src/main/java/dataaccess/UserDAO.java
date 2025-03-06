@@ -10,12 +10,6 @@ public interface UserDAO {
 
     UserData getUser(String userToken) throws DataAccessException;
 
-    void updateUser(UserData userData) throws DataAccessException;
-
-    void removeUser(UserData userData) throws DataAccessException;
-
-    Collection<UserData> listUsers() throws DataAccessException;
-
     void clearUsers() throws DataAccessException;
 
 }
