@@ -10,7 +10,7 @@ public interface UserDAO {
 
     UserData getUser(String username) throws DataAccessException;
 
-    Collection<UserData> listUsers();
+    Collection<UserData> listUsers() throws DataAccessException;
 
     void clearUsers() throws DataAccessException;
 
