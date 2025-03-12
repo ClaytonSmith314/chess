@@ -27,6 +27,10 @@ public class MemoryUserDAO implements UserDAO {
         throw new DataAccessException("Error: unauthorized");
     }
 
+    public Collection<UserData> listUsers() {
+        return new ArrayList<UserData>(userDataBase);
+    }
+
     public void clearUsers() {
         userDataBase = new ArrayList<UserData>();
     }
