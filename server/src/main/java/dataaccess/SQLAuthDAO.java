@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-class SQLAuthDAO implements AuthDAO {
+public class SQLAuthDAO implements AuthDAO {
 
     public SQLAuthDAO() throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {

@@ -15,12 +15,12 @@ import javax.xml.crypto.Data;
 
 public class Service {
 
-    private AuthDAO authDAO = new MemoryAuthDAO();
     private GameDAO gameDAO = new MemoryGameDAO();
 
 
     public void clear() throws DataAccessException{
         UserDAO userDAO = new SQLUserDAO();
+        AuthDAO authDAO = new SQLAuthDAO();
         authDAO.clearAuth();
         gameDAO.clearGames();
         userDAO.clearUsers();
@@ -28,6 +28,7 @@ public class Service {
 
     public AuthData register(UserData userData) throws DataAccessException{
         UserDAO userDAO = new SQLUserDAO();
+        AuthDAO authDAO = new SQLAuthDAO();
         if(userData.password()==null || userData.username()==null || userData.email()==null) {
             throw new DataAccessException("Error: bad request");
         }
@@ -43,6 +44,7 @@ public class Service {
 
     public AuthData login(LoginData loginData) throws DataAccessException {
         UserDAO userDAO = new SQLUserDAO();
+        AuthDAO authDAO = new SQLAuthDAO();
         UserData userData = userDAO.getUser(loginData.username());
         if (!BCrypt.checkpw(loginData.password(), userData.password())) {
             throw new DataAccessException("Error: unauthorized");
@@ -54,16 +56,19 @@ public class Service {
     }
 
     public void logout(String authToken) throws DataAccessException{
+        AuthDAO authDAO = new SQLAuthDAO();
         AuthData authData = authDAO.getAuth(authToken);
         authDAO.removeAuth(authData);
     }
 
     public GamesList listGames(String authToken) throws DataAccessException{
+        AuthDAO authDAO = new SQLAuthDAO();
         authDAO.getAuth(authToken);
         return new GamesList(gameDAO.listGames());
     }
 
     public GameId createGame(String authToken, GameName gameName) throws DataAccessException{
+        AuthDAO authDAO = new SQLAuthDAO();
         AuthData authData = authDAO.getAuth(authToken);
         int gameId = generateGameId();
         ChessGame chessGame = new ChessGame();
@@ -73,6 +78,7 @@ public class Service {
     }
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws DataAccessException{
+        AuthDAO authDAO = new SQLAuthDAO();
         AuthData authData = authDAO.getAuth(authToken);
         GameData gameData = gameDAO.getGame(joinGameData.gameID());
         if(joinGameData.playerColor()==null) {
