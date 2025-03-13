@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.UUID;
 
 import dataaccess.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 
@@ -30,7 +31,10 @@ public class Service {
         if(userData.password()==null || userData.username()==null || userData.email()==null) {
             throw new DataAccessException("Error: bad request");
         }
-        userDAO.addUser(userData);
+        UserData userDataWithHashedPassword = new UserData(
+                userData.username(), hashPassword(userData.password()), userData.email()
+        );
+        userDAO.addUser(userDataWithHashedPassword);
         String authToken = generateAuthToken();
         AuthData authData = new AuthData(authToken, userData.username());
         authDAO.addAuth(authData);
@@ -40,7 +44,7 @@ public class Service {
     public AuthData login(LoginData loginData) throws DataAccessException {
         UserDAO userDAO = new SQLUserDAO();
         UserData userData = userDAO.getUser(loginData.username());
-        if (!userData.password().equals(loginData.password())) {
+        if (!BCrypt.checkpw(loginData.password(), userData.password())) {
             throw new DataAccessException("Error: unauthorized");
         }
         String authToken = generateAuthToken();
@@ -107,6 +111,11 @@ public class Service {
     private static String generateAuthToken() {
         return UUID.randomUUID().toString();
     }
+
+    private static String hashPassword(String clearTextPassword) {
+        return BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+    }
+
 
     private static int nextGameId = 0;
     private static int generateGameId() {
