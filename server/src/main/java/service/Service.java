@@ -16,15 +16,17 @@ public class Service {
 
     private AuthDAO authDAO = new MemoryAuthDAO();
     private GameDAO gameDAO = new MemoryGameDAO();
-    private UserDAO userDAO = new MemoryUserDAO();
+
 
     public void clear() throws DataAccessException{
+        UserDAO userDAO = new SQLUserDAO();
         authDAO.clearAuth();
         gameDAO.clearGames();
         userDAO.clearUsers();
     }
 
     public AuthData register(UserData userData) throws DataAccessException{
+        UserDAO userDAO = new SQLUserDAO();
         if(userData.password()==null || userData.username()==null || userData.email()==null) {
             throw new DataAccessException("Error: bad request");
         }
@@ -36,6 +38,7 @@ public class Service {
     }
 
     public AuthData login(LoginData loginData) throws DataAccessException {
+        UserDAO userDAO = new SQLUserDAO();
         UserData userData = userDAO.getUser(loginData.username());
         if (!userData.password().equals(loginData.password())) {
             throw new DataAccessException("Error: unauthorized");

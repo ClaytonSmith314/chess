@@ -14,7 +14,6 @@ public class Handler {
     private Gson serializer = new Gson();
     private Service service = new Service();
 
-
     public String handleClear(Request req, Response res){
         try {
             service.clear();

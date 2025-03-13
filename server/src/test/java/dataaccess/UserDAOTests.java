@@ -19,12 +19,10 @@ public class UserDAOTests {
             "johndoe",
             "abcd",
             "johndoe2@notasite.com");
-
     private final UserData jamesUserData = new UserData(
             "jamessmith",
             "abcd",
-            "jamessmith@notasite.com"
-    );
+            "jamessmith@notasite.com");
 
     @BeforeAll
     public static void createDatabase() throws DataAccessException {

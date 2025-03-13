@@ -3,6 +3,7 @@ package service;
 import chess.ChessPiece;
 import model.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +11,13 @@ import service.Service;
 import dataaccess.DataAccessException;
 
 public class ServiceTests {
+
+
+    @BeforeEach
+    public void cleardb() throws DataAccessException{
+        Service service = new Service();
+        service.clear();
+    }
 
     @Test
     public void testRegisterNoException() {

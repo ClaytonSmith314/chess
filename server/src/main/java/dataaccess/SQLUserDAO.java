@@ -30,7 +30,7 @@ public class SQLUserDAO implements UserDAO{
     public void addUser(UserData userData) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(
-                    "SELECT 1 FROM userData WHERE username=? LIMIT 1")) {
+                    "SELECT 1 FROM userData WHERE BINARY username=? LIMIT 1")) {
                 preparedStatement.setString(1, userData.username());
                 var rs = preparedStatement.executeQuery();
                 if (rs.next()) {
@@ -52,7 +52,7 @@ public class SQLUserDAO implements UserDAO{
     public UserData getUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(
-                    "SELECT username, password, email FROM userData WHERE username=?")) {
+                    "SELECT username, password, email FROM userData WHERE BINARY username=? LIMIT 1")) {
                 preparedStatement.setString(1, username);
                 try(var rs = preparedStatement.executeQuery()) {
                     if (rs.next()) {
@@ -62,7 +62,7 @@ public class SQLUserDAO implements UserDAO{
                                 rs.getString("email"));
                         return userData;
                     } else {
-                        throw new DataAccessException("\"Error: unauthorized\"");
+                        throw new DataAccessException("Error: unauthorized");
                     }
                 }
             }

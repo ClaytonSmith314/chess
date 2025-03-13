@@ -1,5 +1,6 @@
 package server;
 
+import dataaccess.DataAccessException;
 import spark.*;
 
 import handler.*;
@@ -7,7 +8,6 @@ import handler.*;
 public class Server {
 
     private Handler handler = new Handler();
-
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
