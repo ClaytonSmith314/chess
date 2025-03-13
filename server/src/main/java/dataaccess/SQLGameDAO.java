@@ -43,6 +43,14 @@ public class SQLGameDAO implements GameDAO {
                 }
             }
             try (var preparedStatement = conn.prepareStatement(
+                    "SELECT 1 FROM gameData WHERE gameName=? LIMIT 1")) {
+                preparedStatement.setString(1, gameData.gameName());
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    throw new DataAccessException("Error: already taken");
+                }
+            }
+            try (var preparedStatement = conn.prepareStatement(
                     """
                         INSERT INTO gameData (gameID, whiteUsername, 
                         blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)
@@ -96,7 +104,7 @@ public class SQLGameDAO implements GameDAO {
                                 );
                         return gameData;
                     } else {
-                        throw new DataAccessException("Error: ungameorized");
+                        throw new DataAccessException("Error: bad request");
                     }
                 }
             }

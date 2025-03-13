@@ -15,12 +15,11 @@ import javax.xml.crypto.Data;
 
 public class Service {
 
-    private GameDAO gameDAO = new MemoryGameDAO();
-
 
     public void clear() throws DataAccessException{
         UserDAO userDAO = new SQLUserDAO();
         AuthDAO authDAO = new SQLAuthDAO();
+        GameDAO gameDAO = new SQLGameDAO();
         authDAO.clearAuth();
         gameDAO.clearGames();
         userDAO.clearUsers();
@@ -63,12 +62,14 @@ public class Service {
 
     public GamesList listGames(String authToken) throws DataAccessException{
         AuthDAO authDAO = new SQLAuthDAO();
+        GameDAO gameDAO = new SQLGameDAO();
         authDAO.getAuth(authToken);
         return new GamesList(gameDAO.listGames());
     }
 
     public GameId createGame(String authToken, GameName gameName) throws DataAccessException{
         AuthDAO authDAO = new SQLAuthDAO();
+        GameDAO gameDAO = new SQLGameDAO();
         AuthData authData = authDAO.getAuth(authToken);
         int gameId = generateGameId();
         ChessGame chessGame = new ChessGame();
@@ -79,6 +80,7 @@ public class Service {
 
     public void joinGame(String authToken, JoinGameData joinGameData) throws DataAccessException{
         AuthDAO authDAO = new SQLAuthDAO();
+        GameDAO gameDAO = new SQLGameDAO();
         AuthData authData = authDAO.getAuth(authToken);
         GameData gameData = gameDAO.getGame(joinGameData.gameID());
         if(joinGameData.playerColor()==null) {
