@@ -28,6 +28,10 @@ public class MemoryAuthDAO implements AuthDAO {
         throw new DataAccessException("Error: unauthorized");
     }
 
+    public Collection<AuthData> listAuth() {
+        return new ArrayList<AuthData>(authDataBase);
+    }
+
     public void removeAuth(AuthData authData) {
         authDataBase.remove(authData);
     }
