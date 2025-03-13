@@ -30,6 +30,14 @@ public class SQLUserDAO implements UserDAO{
     public void addUser(UserData userData) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement(
+                    "SELECT 1 FROM userData WHERE username=? LIMIT 1")) {
+                preparedStatement.setString(1, userData.username());
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    throw new DataAccessException("Error: already taken");
+                }
+            }
+            try (var preparedStatement = conn.prepareStatement(
                     "INSERT INTO userData (username, password, email) VALUES(?, ?, ?)")) {
                 preparedStatement.setString(1, userData.username());
                 preparedStatement.setString(2, userData.password());

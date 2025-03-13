@@ -29,16 +29,18 @@ public class UserDAOTests {
     @BeforeAll
     public static void createDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
+        UserDAO userDAO = new SQLUserDAO();
+        userDAO.clearUsers();
     }
 
     @Test
-    @Order(0)
+    @Order(1)
     public void verifyDbConnection() {
         Assertions.assertDoesNotThrow(()->{new SQLUserDAO();});
     }
 
     @Test
-    @Order(1)
+    @Order(2)
     public void addUserTest() throws DataAccessException{
         UserDAO userDAO = new SQLUserDAO();
         Assertions.assertDoesNotThrow(()->userDAO.addUser(johnUserData));
@@ -46,17 +48,27 @@ public class UserDAOTests {
 
         Assertions.assertTrue(userDAO.listUsers().contains(johnUserData));
         Assertions.assertTrue(userDAO.listUsers().contains(jamesUserData));
+
+        UserDAO userDAO2 = new SQLUserDAO();
+
+        Assertions.assertTrue(userDAO2.listUsers().contains(johnUserData));
+        Assertions.assertTrue(userDAO2.listUsers().contains(jamesUserData));
     }
     @Test
-    @Order(2)
+    @Order(3)
     public void addUserUsernameTakenTest() throws DataAccessException{
         UserDAO userDAO = new SQLUserDAO();
+
+        Assertions.assertDoesNotThrow(()->userDAO.addUser(johnUserData));
+        Assertions.assertDoesNotThrow(()->userDAO.addUser(jamesUserData));
+        Assertions.assertTrue(userDAO.listUsers().contains(johnUserData));
+
         //johndoe username was already added in last test
         Assertions.assertThrows(DataAccessException.class, ()->userDAO.addUser(john2UserData));
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     public void getUserTest() throws DataAccessException {
         UserDAO userDAO = new SQLUserDAO();
 
@@ -64,7 +76,7 @@ public class UserDAOTests {
         Assertions.assertEquals(jamesUserData, userDAO.getUser(jamesUserData.username()));
     }
     @Test
-    @Order(4)
+    @Order(5)
     public void getUserIncorrectUsernameTest() throws DataAccessException {
         UserDAO userDAO = new SQLUserDAO();
 
@@ -73,7 +85,7 @@ public class UserDAOTests {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     public void clearUsersTest() throws DataAccessException {
         UserDAO userDAO = new SQLUserDAO();
         userDAO.clearUsers();
