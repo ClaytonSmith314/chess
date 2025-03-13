@@ -91,14 +91,14 @@ public class SQLAuthDAO implements AuthDAO {
 
     public void removeAuth(AuthData authData) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-//            try (var preparedStatement = conn.prepareStatement(
-//                    "SELECT 1 FROM authData WHERE BINARY authToken=? LIMIT 1")) {
-//                preparedStatement.setString(1, authData.authToken());
-//                var rs = preparedStatement.executeQuery();
-//                if (rs.next()) {
-//                    throw new DataAccessException("Error: already taken");
-//                }
-//            }
+            try (var preparedStatement = conn.prepareStatement(
+                    "SELECT 1 FROM authData WHERE BINARY authToken=? LIMIT 1")) {
+                preparedStatement.setString(1, authData.authToken());
+                var rs = preparedStatement.executeQuery();
+                if (!rs.next()) {
+                    throw new DataAccessException("Error: bad request");
+                }
+            }
             try (var preparedStatement = conn.prepareStatement(
                     "DELETE FROM authData WHERE BINARY authToken=? LIMIT 1")) {
                 preparedStatement.setString(1, authData.authToken());

@@ -14,6 +14,10 @@ public class AuthDAOTests {
     private final AuthData jamesAuthData = new AuthData(
             "authtoken2",
             "jamessmith");
+    private final AuthData badAuthToken = new AuthData(
+            "badAuth",
+            "johndoe"
+    );
 
     @BeforeAll
     public static void createDatabase() throws DataAccessException {
@@ -87,7 +91,8 @@ public class AuthDAOTests {
         AuthDAO authDAO = new SQLAuthDAO();
         Assertions.assertDoesNotThrow(()->authDAO.addAuth(johnAuthData));
         Assertions.assertDoesNotThrow(()->authDAO.addAuth(jamesAuthData));
-        authDAO.removeAuth(john2AuthData);
+        Assertions.assertThrows(DataAccessException.class,
+                ()->authDAO.removeAuth(badAuthToken));
     }
     
     @Test
