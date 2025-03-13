@@ -200,4 +200,16 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ChessGame other) {
+            return (
+                    other.getBoard().equals(this.getBoard())
+                    && other.getTeamTurn().equals(this.getTeamTurn())
+            );
+        } else {
+            return false;
+        }
+    }
 }
