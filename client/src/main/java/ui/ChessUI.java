@@ -133,9 +133,9 @@ public class ChessUI {
 
     private void listGames() {
         Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
-        System.out.println("GAME ID\t|\tNAME");
+        System.out.println("ID\t|  GAME NAME\n----------------");
         for(var game:games) {
-            System.out.println(game.gameID()+"\t|\t"+game.gameName());
+            System.out.println(game.gameID()+"\t|  "+game.gameName());
         }
         System.out.println();
     }
