@@ -49,15 +49,19 @@ public class HttpClient {
 
             //unpack response
             var statusCode = http.getResponseCode();
-            var message = "{}";
-            try (InputStream respBody = http.getInputStream()) {
-                message = readStream(respBody);
-            }
-
             //return if status is 200. Else throw error
             if (statusCode==200) {
+                var message = "{}";
+                try (InputStream respBody = http.getInputStream()) {
+                    message = readStream(respBody);
+                }
                 return message;
             } else {
+                var messageJson = "";
+                try (InputStream respBody = http.getErrorStream()) {
+                    messageJson = readStream(respBody);
+                }
+                String message = messageJson.split("\"")[3];
                 throw new HttpException(statusCode, message);
             }
 
