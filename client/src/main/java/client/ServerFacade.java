@@ -1,8 +1,10 @@
 package client;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import model.*;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -36,7 +38,8 @@ public class ServerFacade {
     }
     
     Collection<GameData> requestListGames(String authToken) throws HttpException {
-        return new ArrayList<GameData>();
+        String resp = client.sendHttpRequest("/game", HttpClient.GET, authToken, null);
+        return serializer.fromJson(resp, GamesList.class).games();
     }
     
     GameId requestCreateGame(String authToken, GameName gameName) throws HttpException {
