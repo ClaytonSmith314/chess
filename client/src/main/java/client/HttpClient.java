@@ -1,5 +1,9 @@
 package client;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,7 +49,10 @@ public class HttpClient {
 
             //unpack response
             var statusCode = http.getResponseCode();
-            var message = http.getResponseMessage();
+            var message = "{}";
+            try (InputStream respBody = http.getInputStream()) {
+                message = readStream(respBody);
+            }
 
             //return if status is 200. Else throw error
             if (statusCode==200) {
@@ -56,6 +63,18 @@ public class HttpClient {
 
         } catch (Exception e) {
             throw new HttpException(-1, e.getMessage());
+        }
+    }
+
+    private static String readStream(InputStream stream) throws IOException {
+        if (stream == null) return "";
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line).append("\n");
+            }
+            return response.toString();
         }
     }
 }

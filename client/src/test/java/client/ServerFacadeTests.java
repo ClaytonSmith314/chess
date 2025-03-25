@@ -4,8 +4,6 @@ import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 
-import java.util.Collection;
-
 
 public class ServerFacadeTests {
 
@@ -26,8 +24,7 @@ public class ServerFacadeTests {
             "AdamThompson", "0987", "adamthompson@notasite.com"
     );
 
-    private static GameId createdGameId1, createdGameId2;
-
+    private static GameId createdGameId;
 
     @BeforeAll
     public static void init() {
@@ -49,12 +46,10 @@ public class ServerFacadeTests {
         auth1 = serverFacade.requestRegister(loggedInUser1);
         auth2 = serverFacade.requestRegister(loggedInUser2);
 
-        createdGameId1 = serverFacade.requestCreateGame(
+        createdGameId = serverFacade.requestCreateGame(
                 auth1.authToken(), new GameName("Game1"));
-
-        createdGameId2 = serverFacade.requestCreateGame(
-                auth2.authToken(), new GameName("Game2"));
     }
+
 
 
     @Test
@@ -66,6 +61,7 @@ public class ServerFacadeTests {
     @Test
     public void requestRegisterTest() {
         Assertions.assertDoesNotThrow(()->serverFacade.requestRegister(notRegisteredUser));
+//        Assertions.assertEquals("", serverFacade.requestRegister(notRegisteredUser).authToken());
     }
     @Test
     public void requestRegisterAlreadyRegisteredTest() {
@@ -120,24 +116,24 @@ public class ServerFacadeTests {
     public void requestJoinGameTest() {
         Assertions.assertDoesNotThrow(()->serverFacade.requestJoinGame(
                 auth1.authToken(),
-                new JoinGameData("WHITE", createdGameId1.gameID())
+                new JoinGameData("WHITE", createdGameId.gameID())
         ));
         Assertions.assertDoesNotThrow(()->serverFacade.requestJoinGame(
                 auth2.authToken(),
-                new JoinGameData("BLACK", createdGameId1.gameID())
+                new JoinGameData("BLACK", createdGameId.gameID())
         ));
     }
     @Test
     public void requestJoinGameSpotFilledTest() {
         Assertions.assertDoesNotThrow(()->serverFacade.requestJoinGame(
                 auth1.authToken(),
-                new JoinGameData("WHITE", createdGameId1.gameID())
+                new JoinGameData("WHITE", createdGameId.gameID())
         ));
         Assertions.assertThrows(
                 HttpException.class,
                 ()->serverFacade.requestJoinGame(
                 auth2.authToken(),
-                new JoinGameData("WHITE", createdGameId1.gameID())
+                new JoinGameData("WHITE", createdGameId.gameID())
         ));
     }
 
