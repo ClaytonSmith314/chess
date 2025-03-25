@@ -49,7 +49,8 @@ public class ServerFacade {
     }
     
     void requestJoinGame(String authToken, JoinGameData joinGameData) throws HttpException {
-        
+        String body = serializer.toJson(joinGameData);
+        client.sendHttpRequest("/game", HttpClient.PUT, authToken, body);
     }
 
 }

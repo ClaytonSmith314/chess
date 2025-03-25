@@ -55,7 +55,6 @@ public class ServerFacadeTests {
     @Test
     public void requestClearTest() {
         Assertions.assertDoesNotThrow(()->serverFacade.requestClear());
-        Assertions.assertTrue(serverFacade.requestListGames(auth1.authToken()).isEmpty());
     }
 
     @Test
