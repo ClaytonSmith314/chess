@@ -93,6 +93,13 @@ public class ServerFacadeTests {
     @Test
     public void requestListGamesTest() {
         Assertions.assertDoesNotThrow(()->serverFacade.requestListGames(auth1.authToken()));
+        boolean containsGameId = false;
+        for(var gameData:serverFacade.requestListGames(auth1.authToken())) {
+            if (gameData.gameID()==createdGameId.gameID()) {
+                containsGameId = true;
+            }
+        }
+        Assertions.assertTrue(containsGameId);
     }
     @Test
     public void requestListGamesBadAuth() {

@@ -40,7 +40,9 @@ public class ServerFacade {
     }
     
     GameId requestCreateGame(String authToken, GameName gameName) throws HttpException {
-        return new GameId(0);
+        String body = serializer.toJson(gameName);
+        String resp = client.sendHttpRequest("/game", HttpClient.POST, authToken, body);
+        return serializer.fromJson(resp, GameId.class);
     }
     
     void requestJoinGame(String authToken, JoinGameData joinGameData) throws HttpException {
