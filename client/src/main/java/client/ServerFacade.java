@@ -7,12 +7,14 @@ import java.util.Collection;
 
 public class ServerFacade {
 
-    public ServerFacade(int port) {
+    private final HttpClient client;
 
+    public ServerFacade(int port) {
+        client = new HttpClient("http://localhost:"+port);
     }
 
     void requestClear() throws HttpException {
-        
+        client.sendHttpRequest("/db", HttpClient.DELETE, null, null);
     }
     
     AuthData requestRegister(UserData userData) throws HttpException {
