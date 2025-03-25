@@ -125,10 +125,17 @@ public class Service {
     }
 
 
-    private static int nextGameId = 0;
-    private static int generateGameId() {
-        nextGameId += 1;
-        return nextGameId;
+    private int generateGameId() throws DataAccessException {
+        GameDAO gameDAO = new SQLGameDAO();
+        int id = 1;
+        for(var game: gameDAO.listGames()) {
+            if(game.gameID()==id) {
+                id += 1;
+            } else if (game.gameID()>id) {
+                return id;
+            }
+        }
+        return id;
     }
 
 }

@@ -2,10 +2,9 @@ package ui;
 
 import client.HttpException;
 import client.ServerFacade;
-import model.AuthData;
-import model.LoginData;
-import model.UserData;
+import model.*;
 
+import java.util.Collection;
 import java.util.Scanner;
 
 public class ChessUI {
@@ -39,6 +38,10 @@ public class ChessUI {
                 } else if (args[0].equals("quit")) {
                     logout();
                     return false;
+                } else if (args[0].equals("create")) {
+                    createGame(args);
+                } else if (args[0].equals("list")) {
+                    listGames();
                 } else {
                     handleBadCommand(args[0]);
                 }
@@ -51,6 +54,8 @@ public class ChessUI {
                     register(args);
                 } else if (args[0].equals("login")) {
                     login(args);
+                } else if (args[0].equals("clear")) { //TODO: remove
+                    clear();
                 } else {
                     handleBadCommand(args[0]);
                 }
@@ -60,6 +65,11 @@ public class ChessUI {
         }
 
         return true;
+    }
+
+    //TODO: remove
+    private void clear() {
+        serverFacade.requestClear();
     }
 
     private void helpLoggedOut() {
@@ -93,7 +103,6 @@ public class ChessUI {
         System.out.println("Logged in as "+loginData.username());
     }
 
-
     private void helpLoggedIn() {
         System.out.println("""
                 create <GAME NAME> - create a chess game
@@ -110,6 +119,25 @@ public class ChessUI {
         serverFacade.requestLogout(sessionAuthData.authToken());
         sessionAuthData = null;
         loggedIn = false;
+    }
+
+    private void createGame(String[] args) {
+        if(args.length!=2) {
+            handleBadArgs(args[0]);
+            return;
+        }
+        GameId gameId = serverFacade.requestCreateGame(
+                sessionAuthData.authToken(), new GameName(args[1]));
+        System.out.println("Created game "+args[1]+" with game id "+gameId.gameID());
+    }
+
+    private void listGames() {
+        Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
+        System.out.println("GAME ID\t|\tNAME");
+        for(var game:games) {
+            System.out.println(game.gameID()+"\t|\t"+game.gameName());
+        }
+        System.out.println();
     }
 
     private void handleBadCommand(String command) {
