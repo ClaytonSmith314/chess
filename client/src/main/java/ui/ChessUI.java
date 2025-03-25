@@ -167,6 +167,8 @@ public class ChessUI {
 
         System.out.println("Joined game "+gameData.gameName()+" with id "+gameData.gameID()+" as team "+args[2]);
 
+        printGameBoard(gameData.game().getBoard(), args[2].equals("BLACK"));
+
     }
 
     private void observeGame(String[] args) {
@@ -182,7 +184,8 @@ public class ChessUI {
             return;
         }
         GameData gameData = getGame(gameId);
-        printGameBoard(gameData.game().getBoard(), false);
+        boolean flip = gameData.blackUsername()!=null && gameData.blackUsername().equals(sessionAuthData.username());
+        printGameBoard(gameData.game().getBoard(), flip);
     }
 
     private GameData getGame(int gameId) {
@@ -210,13 +213,12 @@ public class ChessUI {
 
 
     private void printGameBoard(ChessBoard board, boolean flip) {
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN);
         boolean isWhite = true;
         for(int i=1; i<=8; i++) {
             for(int j=1; j<=8; j++) {
                 int row = flip? i : 9-i;
                 ChessPiece piece = board.getPiece(new ChessPosition(row, j));
-                System.out.print(isWhite? EscapeSequences.SET_BG_COLOR_WHITE: EscapeSequences.SET_BG_COLOR_BLACK);
+                System.out.print(isWhite? EscapeSequences.SET_BG_COLOR_DARK_GREY: EscapeSequences.SET_BG_COLOR_BLACK);
                 isWhite = !isWhite;
                 System.out.print(drawPiece(piece));
             }
@@ -232,6 +234,7 @@ public class ChessUI {
         if(piece == null) {
             return EscapeSequences.EMPTY;
         } else if (piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
             return switch (piece.getPieceType()) {
                 case PAWN -> EscapeSequences.WHITE_PAWN;
                 case ROOK -> EscapeSequences.WHITE_ROOK;
@@ -241,6 +244,7 @@ public class ChessUI {
                 case KING -> EscapeSequences.WHITE_KING;
             };
         } else {
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_MAGENTA);
             return switch (piece.getPieceType()) {
                 case PAWN -> EscapeSequences.BLACK_PAWN;
                 case ROOK -> EscapeSequences.BLACK_ROOK;
