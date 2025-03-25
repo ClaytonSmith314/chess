@@ -7,6 +7,10 @@ import java.util.Collection;
 
 public class ServerFacade {
 
+    public ServerFacade(int port) {
+
+    }
+
     void requestClear() throws HttpException {
         
     }
@@ -31,7 +35,7 @@ public class ServerFacade {
         return new GameId(0);
     }
     
-    void requestJoinGame(JoinGameData joinGameData) throws HttpException {
+    void requestJoinGame(String authToken, JoinGameData joinGameData) throws HttpException {
         
     }
 
