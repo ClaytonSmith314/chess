@@ -1,5 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import client.HttpException;
 import client.ServerFacade;
 import model.*;
@@ -42,6 +46,10 @@ public class ChessUI {
                     createGame(args);
                 } else if (args[0].equals("list")) {
                     listGames();
+                } else if (args[0].equals("join")) {
+                    joinGame(args);
+                } else if (args[0].equals("observe")) {
+                    observeGame(args);
                 } else {
                     handleBadCommand(args[0]);
                 }
@@ -140,15 +148,107 @@ public class ChessUI {
         System.out.println();
     }
 
+    private void joinGame(String[] args) {
+        if(args.length!=3) {
+            handleBadArgs(args[0]);
+            return;
+        }
+        int gameId = 0;
+        try {
+            gameId = Integer.valueOf(args[1]);
+        } catch(NumberFormatException e) {
+            handleBadArgs(args[0]);
+            return;
+        }
+        var joinGameData = new JoinGameData(args[2], gameId);
+        serverFacade.requestJoinGame(sessionAuthData.authToken(), joinGameData);
+
+        GameData gameData = getGame(gameId);
+
+        System.out.println("Joined game "+gameData.gameName()+" with id "+gameData.gameID()+" as team "+args[2]);
+
+    }
+
+    private void observeGame(String[] args) {
+        if(args.length!=2) {
+            handleBadArgs(args[0]);
+            return;
+        }
+        int gameId = 0;
+        try {
+            gameId = Integer.valueOf(args[1]);
+        } catch(NumberFormatException e) {
+            handleBadArgs(args[0]);
+            return;
+        }
+        GameData gameData = getGame(gameId);
+        printGameBoard(gameData.game().getBoard(), false);
+    }
+
+    private GameData getGame(int gameId) {
+        Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
+        for(var game: games) {
+            if(game.gameID()==gameId) {
+                return game;
+            }
+        }
+        return null;
+    }
+
     private void handleBadCommand(String command) {
-        System.out.println(command+" is not a command. Enter 'help' for available commands");
+        System.out.println("Error: "+command+" is not a command. Enter 'help' for available commands");
     }
 
     private void handleBadArgs(String command) {
-        System.out.println("Incorrect arguments for command "+command+". Enter 'help' for command usage");
+        System.out.println("Error: Incorrect arguments for command "+command+". Enter 'help' for command usage");
     }
 
     private void handleHttpException(HttpException e) {
         System.out.println(e.getMessage());
+    }
+
+
+
+    private void printGameBoard(ChessBoard board, boolean flip) {
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN);
+        boolean isWhite = true;
+        for(int i=1; i<=8; i++) {
+            for(int j=1; j<=8; j++) {
+                int row = flip? i : 9-i;
+                ChessPiece piece = board.getPiece(new ChessPosition(row, j));
+                System.out.print(isWhite? EscapeSequences.SET_BG_COLOR_WHITE: EscapeSequences.SET_BG_COLOR_BLACK);
+                isWhite = !isWhite;
+                System.out.print(drawPiece(piece));
+            }
+            System.out.print(EscapeSequences.RESET_BG_COLOR);
+            System.out.println();
+            isWhite = !isWhite;
+        }
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+        System.out.print(EscapeSequences.RESET_BG_COLOR);
+    }
+
+    private String drawPiece(ChessPiece piece) {
+        if(piece == null) {
+            return EscapeSequences.EMPTY;
+        } else if (piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
+            return switch (piece.getPieceType()) {
+                case PAWN -> EscapeSequences.WHITE_PAWN;
+                case ROOK -> EscapeSequences.WHITE_ROOK;
+                case KNIGHT -> EscapeSequences.WHITE_KNIGHT;
+                case BISHOP -> EscapeSequences.WHITE_BISHOP;
+                case QUEEN -> EscapeSequences.WHITE_QUEEN;
+                case KING -> EscapeSequences.WHITE_KING;
+            };
+        } else {
+            return switch (piece.getPieceType()) {
+                case PAWN -> EscapeSequences.BLACK_PAWN;
+                case ROOK -> EscapeSequences.BLACK_ROOK;
+                case KNIGHT -> EscapeSequences.BLACK_KNIGHT;
+                case BISHOP -> EscapeSequences.BLACK_BISHOP;
+                case QUEEN -> EscapeSequences.BLACK_QUEEN;
+                case KING -> EscapeSequences.BLACK_KING;
+            };
+        }
     }
 }
