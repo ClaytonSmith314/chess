@@ -70,15 +70,14 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void requestLoginAfterLogoutTest() {
-        Assertions.assertDoesNotThrow(()->serverFacade.requestLogout(auth1.authToken()));
+    public void requestLoginTest() {
         Assertions.assertDoesNotThrow(()->serverFacade.requestLogin(
                 loggedInUser1.getLoginData()));
     }
     @Test
-    public void requestLoginAlreadyLoggedInTest() {
+    public void requestLoginWrongUsernameAndPasswordTest() {
         Assertions.assertThrows(HttpException.class,
-                ()->serverFacade.requestLogin(loggedInUser1.getLoginData()));
+                ()->serverFacade.requestLogin(notRegisteredUser.getLoginData()));
     }
 
     @Test
