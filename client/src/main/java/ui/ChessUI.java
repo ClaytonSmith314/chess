@@ -214,20 +214,38 @@ public class ChessUI {
 
     private void printGameBoard(ChessBoard board, boolean flip) {
         boolean isWhite = true;
+        drawCols(flip);
         for(int i=1; i<=8; i++) {
+            int row = flip? i : 9-i;
+            System.out.print(EscapeSequences.RESET_TEXT_COLOR);
+            System.out.print(EscapeSequences.RESET_BG_COLOR);
+            System.out.print(" "+row+"\u2003");
             for(int j=1; j<=8; j++) {
-                int row = flip? i : 9-i;
-                ChessPiece piece = board.getPiece(new ChessPosition(row, j));
+                int col = flip? j : 9-j;
+                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 System.out.print(isWhite? EscapeSequences.SET_BG_COLOR_DARK_GREY: EscapeSequences.SET_BG_COLOR_BLACK);
                 isWhite = !isWhite;
                 System.out.print(drawPiece(piece));
             }
+            System.out.print(EscapeSequences.RESET_TEXT_COLOR);
             System.out.print(EscapeSequences.RESET_BG_COLOR);
+            System.out.print(" "+row+"\u2003");
             System.out.println();
             isWhite = !isWhite;
         }
+        drawCols(flip);
+        System.out.println();
+    }
+
+    private void drawCols(boolean flip) {
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
         System.out.print(EscapeSequences.RESET_BG_COLOR);
+        String colLetters = "abcdefgh";
+        System.out.print(EscapeSequences.EMPTY);
+        for(int i=0; i<8; i++) {
+            System.out.print(" "+colLetters.charAt(i)+"\u2003");
+        }
+        System.out.println(EscapeSequences.EMPTY);
     }
 
     private String drawPiece(ChessPiece piece) {
