@@ -66,7 +66,11 @@ public class HttpClient {
             }
 
         } catch (Exception e) {
-            throw new HttpException(-1, e.getMessage());
+            if(e instanceof HttpException httpException){
+                throw httpException;
+            } else {
+                throw new HttpException(-1, e.getMessage());
+            }
         }
     }
 

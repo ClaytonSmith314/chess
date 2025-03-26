@@ -167,8 +167,10 @@ public class ChessUI {
 
         System.out.println("Joined game "+gameData.gameName()+" with id "+gameData.gameID()+" as team "+args[2]);
 
-        printGameBoard(gameData.game().getBoard(), args[2].equals("BLACK"));
+//        printGameBoard(gameData.game().getBoard(), args[2].equals("BLACK"));
 
+        printGameBoard(gameData.game().getBoard(), false);
+        printGameBoard(gameData.game().getBoard(), true);
     }
 
     private void observeGame(String[] args) {
@@ -207,7 +209,11 @@ public class ChessUI {
     }
 
     private void handleHttpException(HttpException e) {
-        System.out.println(e.getMessage());
+        if(e.code == -1) {
+            System.out.println("Error: internal error");
+        } else {
+            System.out.println(e.getMessage());
+        }
     }
 
 
@@ -221,7 +227,7 @@ public class ChessUI {
             System.out.print(EscapeSequences.RESET_BG_COLOR);
             System.out.print(" "+row+"\u2003");
             for(int j=1; j<=8; j++) {
-                int col = flip? j : 9-j;
+                int col = flip? 9-j : j;
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 System.out.print(isWhite? EscapeSequences.SET_BG_COLOR_DARK_GREY: EscapeSequences.SET_BG_COLOR_BLACK);
                 isWhite = !isWhite;
@@ -242,8 +248,9 @@ public class ChessUI {
         System.out.print(EscapeSequences.RESET_BG_COLOR);
         String colLetters = "abcdefgh";
         System.out.print(EscapeSequences.EMPTY);
-        for(int i=0; i<8; i++) {
-            System.out.print(" "+colLetters.charAt(i)+"\u2003");
+        for(int j=0; j<8; j++) {
+            int col = flip? 7-j : j;
+            System.out.print("\u2003"+colLetters.charAt(col)+" ");
         }
         System.out.println(EscapeSequences.EMPTY);
     }
