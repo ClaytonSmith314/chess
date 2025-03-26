@@ -13,6 +13,7 @@ public class ServerFacade {
     private final HttpClient client;
     private final Gson serializer = new Gson();
 
+
     public ServerFacade(int port) {
         client = new HttpClient("http://localhost:"+port);
     }

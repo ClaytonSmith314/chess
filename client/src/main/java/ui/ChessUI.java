@@ -8,7 +8,9 @@ import client.HttpException;
 import client.ServerFacade;
 import model.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ChessUI {
@@ -16,6 +18,27 @@ public class ChessUI {
     private boolean loggedIn = false;
     private AuthData sessionAuthData = null;
     private ServerFacade serverFacade;
+    private final HashMap<Integer, Integer> gameIdMap = new HashMap<>();
+
+    private int addNewId(int dbId) {
+        if(!gameIdMap.containsValue(dbId)) {
+            int visualId = (int) (Math.random() * 3 * gameIdMap.size());
+            while(gameIdMap.containsKey(visualId)){
+                visualId = (int) (Math.random() * 3 * gameIdMap.size());
+            }
+            gameIdMap.put(visualId, dbId);
+            return visualId;
+        } else {
+            for(var key: gameIdMap.keySet()) {
+                if (gameIdMap.get(key) == dbId) {
+                    return key;
+                }
+            }
+        }
+        return -1;
+    }
+
+
 
     public ChessUI(int port) {
         serverFacade = new ServerFacade(port);
@@ -129,14 +152,20 @@ public class ChessUI {
         }
         GameId gameId = serverFacade.requestCreateGame(
                 sessionAuthData.authToken(), new GameName(args[1]));
-        System.out.println("Created game "+args[1]+" with game id "+gameId.gameID());
+        int visualId = addNewId(gameId.gameID());
+        System.out.println("Created game "+args[1]+" with game id "+visualId);
     }
 
     private void listGames() {
         Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
-        System.out.println("ID\t|  GAME NAME\n----------------");
+        System.out.println("ID\t|  GAME NAME\t|  WHITE PLAYER\t|  BLACK PLAYER\n" +
+                "-----------------------------------------------");
         for(var game:games) {
-            System.out.println(game.gameID()+"\t|  "+game.gameName());
+            int visualId = addNewId(game.gameID());
+            String whiteUsername = (game.whiteUsername()==null)? "\t": game.whiteUsername();
+            String blackUsername = (game.blackUsername()==null)? "\t": game.blackUsername();
+            System.out.println(visualId+"\t|  "+game.gameName()+"\t|  "
+                +whiteUsername+"\t|  "+blackUsername);
         }
         System.out.println();
     }
@@ -148,7 +177,7 @@ public class ChessUI {
         }
         int gameId = 0;
         try {
-            gameId = Integer.valueOf(args[1]);
+            gameId = gameIdMap.get(Integer.valueOf(args[1]));
         } catch(NumberFormatException e) {
             handleBadArgs(args[0]);
             return;
@@ -158,7 +187,7 @@ public class ChessUI {
 
         GameData gameData = getGame(gameId);
 
-        System.out.println("Joined game "+gameData.gameName()+" with id "+gameData.gameID()+" as team "+args[2]);
+        System.out.println("Joined game "+gameData.gameName()+" with id "+gameId+" as team "+args[2]);
 
 //        printGameBoard(gameData.game().getBoard(), args[2].equals("BLACK"));
 
@@ -183,10 +212,11 @@ public class ChessUI {
         printGameBoard(gameData.game().getBoard(), flip);
     }
 
-    private GameData getGame(int gameId) {
+    private GameData getGame(int visualGameId) {
+        int serverGameId = gameIdMap.get(visualGameId);
         Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
         for(var game: games) {
-            if(game.gameID()==gameId) {
+            if(game.gameID()==serverGameId) {
                 return game;
             }
         }
@@ -273,4 +303,7 @@ public class ChessUI {
             };
         }
     }
+
+
+
 }
