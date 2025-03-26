@@ -12,10 +12,10 @@ public class HttpClient {
 
     private final String rootUri;
 
-    public static String GET = "GET";
-    public static String POST = "POST";
-    public static String DELETE = "DELETE";
-    public static String PUT = "PUT";
+    public static final String GET = "GET";
+    public static final String POST = "POST";
+    public static final String DELETE = "DELETE";
+    public static final String PUT = "PUT";
 
     public HttpClient(String rootUri) {
         this.rootUri = rootUri;
@@ -75,7 +75,9 @@ public class HttpClient {
     }
 
     private static String readStream(InputStream stream) throws IOException {
-        if (stream == null) return "";
+        if (stream == null) {
+            return "";
+        }
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
             StringBuilder response = new StringBuilder();
             String line;

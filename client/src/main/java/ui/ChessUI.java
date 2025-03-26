@@ -62,8 +62,6 @@ public class ChessUI {
                     register(args);
                 } else if (args[0].equals("login")) {
                     login(args);
-                } else if (args[0].equals("clear")) { //TODO: remove
-                    clear();
                 } else {
                     handleBadCommand(args[0]);
                 }
@@ -73,11 +71,6 @@ public class ChessUI {
         }
 
         return true;
-    }
-
-    //TODO: remove
-    private void clear() {
-        serverFacade.requestClear();
     }
 
     private void helpLoggedOut() {
