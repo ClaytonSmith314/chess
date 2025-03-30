@@ -22,10 +22,7 @@ public class ChessUI {
 
     private int addNewId(int dbId) {
         if(!gameIdMap.containsValue(dbId)) {
-            int visualId = (int) (Math.random() * 3 * gameIdMap.size());
-            while(gameIdMap.containsKey(visualId)){
-                visualId = (int) (Math.random() * 3 * gameIdMap.size());
-            }
+            int visualId = gameIdMap.size()+1;
             gameIdMap.put(visualId, dbId);
             return visualId;
         } else {
@@ -158,14 +155,14 @@ public class ChessUI {
 
     private void listGames() {
         Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
-        System.out.println("ID\t|  GAME NAME\t|  WHITE PLAYER\t|  BLACK PLAYER\n" +
-                "-----------------------------------------------");
+        System.out.println("ID\t|  GAME NAME\t|  WHITE PLAYER\t|  BLACK PLAYER\t|\n" +
+                "-----------------------------------------------------");
         for(var game:games) {
             int visualId = addNewId(game.gameID());
-            String whiteUsername = (game.whiteUsername()==null)? "\t": game.whiteUsername();
-            String blackUsername = (game.blackUsername()==null)? "\t": game.blackUsername();
-            System.out.println(visualId+"\t|  "+game.gameName()+"\t|  "
-                +whiteUsername+"\t|  "+blackUsername);
+            String whiteUsername = (game.whiteUsername()==null)? "": game.whiteUsername();
+            String blackUsername = (game.blackUsername()==null)? "": game.blackUsername();
+            System.out.println(visualId+"\t|  "+lengthen(game.gameName(),10)+"|  "
+                +lengthen(whiteUsername, 10)+"|  "+lengthen(blackUsername,10)+"|");
         }
         System.out.println();
     }
@@ -304,6 +301,13 @@ public class ChessUI {
         }
     }
 
-
+    private String lengthen(String src, int len) {
+        StringBuilder out = new StringBuilder(src);
+        while(out.length() < len) {
+            out.append(" ");
+        }
+        out.append("\t");
+        return out.toString();
+    }
 
 }
