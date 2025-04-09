@@ -2,9 +2,21 @@ package wsgame;
 
 import model.GameId;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class GameRoom {
+
+    private static final ConcurrentHashMap<GameId, GameRoom> gameIdsToGameRoom = new ConcurrentHashMap<>();
+
+    public static GameRoom fromGameId(GameId gameId) {
+        return gameIdsToGameRoom.get(gameId);
+    }
+
+    public GameRoom(GameId gameId) {
+        gameIdsToGameRoom.put(gameId, this);
+    }
 
     GameId gameId;
 
@@ -15,8 +27,10 @@ public class GameRoom {
 
     Collection<UserConnection> observers;
 
-    public void onMessage(UserConnection connection, String message) {
-        //TODO:
+    Collection<UserConnection> connectedUsers = new ArrayList<>();
+
+    public void addUser(UserConnection connection, UserConnection.UserRole role) {
+        connectedUsers.add(connection);
     }
 
 }
