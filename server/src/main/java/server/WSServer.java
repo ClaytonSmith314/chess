@@ -16,13 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WSServer {
 
     private static final ConcurrentHashMap<Session, UserConnection> sessionToUserConnection = new ConcurrentHashMap<>();
-    private Gson serializer = new Gson();
-
-    public static void main(String[] args) {
-        Spark.port(8080);
-        Spark.webSocket("/ws", WSServer.class);
-        Spark.get("/echo/:msg", (req, res) -> "HTTP response: " + req.params(":msg"));
-    }
+    private static final Gson serializer = new Gson();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {

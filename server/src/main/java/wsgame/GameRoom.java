@@ -1,6 +1,8 @@
 package wsgame;
 
 import model.GameId;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,14 +10,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GameRoom {
 
+
     private static final ConcurrentHashMap<GameId, GameRoom> gameIdsToGameRoom = new ConcurrentHashMap<>();
 
     public static GameRoom fromGameId(GameId gameId) {
         return gameIdsToGameRoom.get(gameId);
     }
 
-    public GameRoom(GameId gameId) {
+    public GameRoom(GameId gameId, UserConnection rootUser, UserGameCommand.UserRole role) {
         gameIdsToGameRoom.put(gameId, this);
+        addUser(rootUser, role);
+        this.rootUser = rootUser;
     }
 
     GameId gameId;
@@ -29,8 +34,31 @@ public class GameRoom {
 
     Collection<UserConnection> connectedUsers = new ArrayList<>();
 
-    public void addUser(UserConnection connection, UserConnection.UserRole role) {
+    public void addUser(UserConnection connection, UserGameCommand.UserRole role) {
         connectedUsers.add(connection);
+        switch (role) {
+            case WHITE_PLAYER -> {
+                whiteUser = connection;
+                broadcastNotification("User "+connection.getUsername()+" joined as the white player.");
+            }
+            case BLACK_PLAYER -> {
+                blackUser = connection;
+                broadcastNotification("User "+connection.getUsername()+" joined as the black player.");
+            }
+            case OBSERVER -> {
+                observers.add(connection);
+                broadcastNotification("User "+connection.getUsername()+" joined as an observer.");
+            }
+        }
+    }
+
+    public void broadcastNotification(String message) {
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        serverMessage.notificationMsg = message;
+
+        for(var connection: connectedUsers) {
+            connection.send(serverMessage);
+        }
     }
 
 }
