@@ -1,10 +1,8 @@
-package server;
+package passoff.server;
 
 import chess.*;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.TestFactory;
 import passoff.model.*;
-import passoff.server.TestServerFacade;
 import passoff.websocket.*;
 import server.Server;
 import websocket.commands.UserGameCommand;
@@ -40,7 +38,7 @@ public class WebSocketTests {
 
         serverFacade = new TestServerFacade("localhost", port);
         serverFacade.clear();
-        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", org.junit.jupiter.api.TestFactory.getGsonBuilder());
+        environment = new WebsocketTestingEnvironment("localhost", port, "/ws", TestFactory.getGsonBuilder());
         waitTime = TestFactory.getMessageTime();
     }
 
@@ -349,7 +347,7 @@ public class WebSocketTests {
 
         assertCommandMessages(actualMessages, true, sender, types(), inGame, types(NOTIFICATION), otherClients);
     }
-    
+
     private Map<String, Integer> expectedMessages(WebsocketUser sender, int senderExpected,
                                                   Set<WebsocketUser> inGame, int inGameExpected, Set<WebsocketUser> otherClients) {
         Map<String, Integer> expectedMessages = new HashMap<>();
@@ -360,9 +358,9 @@ public class WebSocketTests {
     }
 
     private void assertCommandMessages(Map<String, List<TestMessage>> messages, boolean expectSuccess,
-                                            WebsocketUser user, ServerMessage.ServerMessageType[] userExpectedTypes,
-                                            Set<WebsocketUser> inGame, ServerMessage.ServerMessageType[] inGameExpectedTypes,
-                                            Set<WebsocketUser> otherClients) {
+                                       WebsocketUser user, ServerMessage.ServerMessageType[] userExpectedTypes,
+                                       Set<WebsocketUser> inGame, ServerMessage.ServerMessageType[] inGameExpectedTypes,
+                                       Set<WebsocketUser> otherClients) {
         if(!expectSuccess) {
             userExpectedTypes = new ServerMessage.ServerMessageType[]{ERROR};
             inGameExpectedTypes = new ServerMessage.ServerMessageType[0];
