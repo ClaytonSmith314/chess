@@ -6,6 +6,7 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import client.HttpException;
 import client.ServerFacade;
+import client.WSServerFacade;
 import model.*;
 
 import java.util.ArrayList;
@@ -15,10 +16,16 @@ import java.util.Scanner;
 
 public class ChessUI {
 
-    private boolean loggedIn = false;
-    private AuthData sessionAuthData = null;
     private ServerFacade serverFacade;
     private final HashMap<Integer, Integer> gameIdMap = new HashMap<>();
+
+    private boolean loggedIn = false;
+    private AuthData sessionAuthData = null;
+
+    private boolean gamePlayMode = false;
+    private boolean isObserver = false;
+    private WSServerFacade wsServerFacade;
+
 
     private int addNewId(int dbId) {
         if(!gameIdMap.containsValue(dbId)) {
@@ -54,7 +61,11 @@ public class ChessUI {
 
 
         try {
-            if(loggedIn) {
+            if(gamePlayMode) {
+                if(args[0].equals("help")) {
+                    helpInGamePlay();
+                }
+            } else if(loggedIn) {
                 if(args[0].equals("help")) {
                     helpLoggedIn();
                 } else if (args[0].equals("logout")) {
@@ -92,6 +103,35 @@ public class ChessUI {
 
         return true;
     }
+
+
+
+    private void helpInGamePlay() {
+        if(isObserver) {
+            System.out.println("""
+                    showmoves <ROW><COL> - show the legal moves of the piece at that location
+                    redraw - redraw the chess board
+                    leave - stop observing the game
+                    """);
+        } else {
+            System.out.println("""
+                    move <START ROW><START COL> <END ROW><END COL> - move a chess piece if it's your turn
+                    showmoves <ROW><COL> - show the legal moves at the column
+                    redraw - redraw the chess board
+                    resign - forfeit the game
+                    leave - stop observing the game
+                    """);
+        }
+    }
+
+    private void leave() {
+
+    }
+
+
+
+
+
 
     private void helpLoggedOut() {
         System.out.println("""
@@ -183,6 +223,10 @@ public class ChessUI {
         serverFacade.requestJoinGame(sessionAuthData.authToken(), joinGameData);
 
         GameData gameData = getGame(gameId);
+
+        //TODO: Create web socket here
+
+
 
         System.out.println("Joined game "+gameData.gameName()+" with id "+gameId+" as team "+args[2]);
 
@@ -300,6 +344,7 @@ public class ChessUI {
             };
         }
     }
+
 
     private String lengthen(String src, int len) {
         StringBuilder out = new StringBuilder(src);
