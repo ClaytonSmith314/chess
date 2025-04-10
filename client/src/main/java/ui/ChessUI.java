@@ -5,7 +5,6 @@ import client.HttpException;
 import client.ServerFacade;
 import client.WSServerFacade;
 import model.*;
-import org.eclipse.jetty.server.Authentication;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
