@@ -83,6 +83,8 @@ public class ChessUI {
                     move(args);
                 } else if(args[0].equals("resign")) {
                     resign();
+                } else if(args[0].equals("showmoves")) {
+                    showMoves(args);
                 } else {
                     handleBadCommand(args[0]);
                 }
@@ -129,6 +131,21 @@ public class ChessUI {
         return true;
     }
 
+    private void showMoves(String[] args) {
+        if(args.length != 2) {
+            handleBadArgs(args[0]);
+        }
+        ChessPosition position = parseChessPosition(args[1]);
+        ChessPiece piece = gameData.game().getBoard().getPiece(position);
+        if(piece==null) {
+            System.out.println("Error: chess position "+position+" is empty");
+            return;
+        }
+        Collection<ChessMove> moves = gameData.game().validMoves(position);
+        printGameBoard(gameData.game().getBoard(), isBlackPlayer&&(!isObserver),
+                        position, moves);
+
+    }
 
 
     private void helpInGamePlay() {
@@ -412,8 +429,12 @@ public class ChessUI {
     }
 
 
-
     private void printGameBoard(ChessBoard board, boolean flip) {
+        printGameBoard(board, flip, null, null);
+    }
+
+    private void printGameBoard(ChessBoard board, boolean flip,
+                                ChessPosition startPosition, Collection<ChessMove> moves) {
         boolean isWhite = true;
         drawCols(flip);
         for(int i=1; i<=8; i++) {
@@ -423,8 +444,18 @@ public class ChessUI {
             System.out.print(" "+row+"\u2003");
             for(int j=1; j<=8; j++) {
                 int col = flip? 9-j : j;
-                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
                 System.out.print(isWhite? EscapeSequences.SET_BG_COLOR_DARK_GREY: EscapeSequences.SET_BG_COLOR_BLACK);
+                if(startPosition!=null) {
+                    ChessMove move = new ChessMove(startPosition, position, null);
+                    if(moves.contains(move)) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_DARK_GREEN);
+                    }
+                    if(startPosition.equals(position)) {
+                        System.out.print(EscapeSequences.SET_BG_COLOR_BLUE);
+                    }
+                }
                 isWhite = !isWhite;
                 System.out.print(drawPiece(piece));
             }
