@@ -7,24 +7,18 @@ import client.WSServerFacade;
 import model.*;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Scanner;
-
 import static ui.EscapeSequences.RESET_TEXT_ITALIC;
 import static ui.EscapeSequences.SET_TEXT_ITALIC;
 
 public class ChessUI {
-
     private static final String COL_LETTERS = "abcdefgh";
-
     private ServerFacade serverFacade;
     private final HashMap<Integer, Integer> gameIdMap = new HashMap<>();
-
     private boolean loggedIn = false;
     private AuthData sessionAuthData = null;
-
     private boolean gamePlayMode = false;
     private boolean isObserver = false;
     private boolean isBlackPlayer = false;
@@ -32,7 +26,6 @@ public class ChessUI {
     private String gameName;
     private WSServerFacade wsServerFacade;
     private GameData gameData;
-
 
     private int addNewId(int dbId) {
         if(!gameIdMap.containsValue(dbId)) {
@@ -48,14 +41,9 @@ public class ChessUI {
         }
         return -1;
     }
-
-
-
     public ChessUI(int port) {
         serverFacade = new ServerFacade(port);
     }
-
-
     public boolean executePrompt() {
         if (loggedIn) {
             if(gamePlayMode) {
@@ -69,8 +57,6 @@ public class ChessUI {
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
         String[] args = line.split(" ");
-
-
         try {
             if(gamePlayMode) {
                 if(args[0].equals("help")) {
@@ -122,15 +108,11 @@ public class ChessUI {
             }
         } catch(HttpException e) {
             handleHttpException(e);
-        } catch(RuntimeException e) {
-
         } catch (Exception e) {
             handleGeneralException(e);
         }
-
         return true;
     }
-
     private void showMoves(String[] args) {
         if(args.length != 2) {
             handleBadArgs(args[0]);
@@ -144,10 +126,7 @@ public class ChessUI {
         Collection<ChessMove> moves = gameData.game().validMoves(position);
         printGameBoard(gameData.game().getBoard(), isBlackPlayer&&(!isObserver),
                         position, moves);
-
     }
-
-
     private void helpInGamePlay() {
         if(isObserver) {
             System.out.println("""
@@ -167,7 +146,6 @@ public class ChessUI {
                     """);
         }
     }
-
     private void leave() throws Exception {
         gamePlayMode = false;
         UserGameCommand command = new UserGameCommand(
@@ -177,7 +155,6 @@ public class ChessUI {
         wsServerFacade.send(command);
         wsServerFacade.close();
     }
-
     private void move(String[] args) throws Exception {
         var startPosition = parseChessPosition(args[1]);
         var endPosition = parseChessPosition(args[2]);
@@ -185,7 +162,6 @@ public class ChessUI {
             handleBadArgs("move");
             return;
         }
-
         ChessPiece piece = gameData.game().getBoard().getPiece(startPosition);
         ChessPiece.PieceType promotion = null;
         if(piece!=null && piece.getPieceType()==ChessPiece.PieceType.PAWN
@@ -195,18 +171,10 @@ public class ChessUI {
                 return;
             }
             switch(args[3].charAt(0)) {
-                default -> {
-                    System.out.println("Error: incorrect promotion piece type (should be one of Q, R, B, Kn)");
-                }
-                case 'Q' -> {
-                    promotion = ChessPiece.PieceType.QUEEN;
-                }
-                case 'R' -> {
-                    promotion = ChessPiece.PieceType.ROOK;
-                }
-                case 'B' -> {
-                    promotion = ChessPiece.PieceType.BISHOP;
-                }
+                default -> {System.out.println("Error: incorrect promotion piece type (should be one of Q, R, B, Kn)");}
+                case 'Q' -> {promotion = ChessPiece.PieceType.QUEEN;}
+                case 'R' -> {promotion = ChessPiece.PieceType.ROOK;}
+                case 'B' -> {promotion = ChessPiece.PieceType.BISHOP;}
                 case 'K' -> {
                     if(args[3].length()<2 || args[3].charAt(1)!='n') {
                         System.out.println("Error: incorrect promotion piece type (should be one of Q, R, B, Kn)");
@@ -229,7 +197,6 @@ public class ChessUI {
         command.move = move;
         wsServerFacade.sendAndWait(command);
     }
-
     private void resign() throws Exception {
         UserGameCommand command = new UserGameCommand(
                 UserGameCommand.CommandType.RESIGN,
@@ -238,7 +205,6 @@ public class ChessUI {
         );
         wsServerFacade.sendAndWait(command);
     }
-
     private ChessPosition parseChessPosition(String s) {
         if(s.length()!=2 || COL_LETTERS.indexOf(s.charAt(0))==-1
             || !Character.isDigit(s.charAt(1)) || Integer.parseInt(s.substring(1,2))>8) {
@@ -248,16 +214,13 @@ public class ChessUI {
         int row = Integer.parseInt(s.substring(1,2));
         return new ChessPosition(row, col);
     }
-
     private void redraw() {
         printGameBoard(gameData.game().getBoard(), isBlackPlayer&&(!isObserver));
     }
-
     public void handleServerNotificationOrError(ServerMessage serverMessage) {
         System.out.println((serverMessage.getServerMessageType()== ServerMessage.ServerMessageType.ERROR)?
                 serverMessage.errorMessage: serverMessage.message);
     }
-
     public void handleLoadGame(ServerMessage serverMessage) {
         if(serverMessage.message != null) {
             System.out.println();
@@ -268,10 +231,6 @@ public class ChessUI {
         System.out.println("Black Player: "+serverMessage.game.blackUsername());
         redraw();
     }
-
-
-
-
     private void helpLoggedOut() {
         System.out.println("""
                 register <USERNAME> <PASSWORD> <EMAIL> - to create an account
@@ -280,7 +239,6 @@ public class ChessUI {
                 help - with possible commands
                 """);
     }
-
     private void register(String[] args) {
         if(args.length!=4) {
             handleBadArgs(args[0]);
@@ -291,7 +249,6 @@ public class ChessUI {
         loggedIn = true;
         System.out.println("Logged in as "+userData.username());
     }
-
     private void login(String[] args) {
         if(args.length!=3) {
             handleBadArgs(args[0]);
@@ -302,7 +259,6 @@ public class ChessUI {
         loggedIn = true;
         System.out.println("Logged in as "+loginData.username());
     }
-
     private void helpLoggedIn() {
         System.out.println("""
                 create <GAME NAME> - create a chess game
@@ -314,13 +270,11 @@ public class ChessUI {
                 help - with possible commands
                 """);
     }
-
     private void logout() {
         serverFacade.requestLogout(sessionAuthData.authToken());
         sessionAuthData = null;
         loggedIn = false;
     }
-
     private void createGame(String[] args) {
         if(args.length!=2) {
             handleBadArgs(args[0]);
@@ -332,14 +286,12 @@ public class ChessUI {
         int visualId = addNewId(gameId.gameID());
         System.out.println("Created game "+args[1]+" with game id "+visualId);
     }
-
     private void reloadGames() {
         Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
         for(var game:games) {
             addNewId(game.gameID());
         }
     }
-
     private void listGames() {
         Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
         System.out.println("ID\t|  GAME NAME\t|  WHITE PLAYER\t|  BLACK PLAYER\t|\n" +
@@ -357,7 +309,6 @@ public class ChessUI {
         }
         System.out.println();
     }
-
     private void joinGame(String[] args) {
         reloadGames();
         if(args.length!=3) {
@@ -370,14 +321,11 @@ public class ChessUI {
         }
         var joinGameData = new JoinGameData(args[2], gameId);
         serverFacade.requestJoinGame(sessionAuthData.authToken(), joinGameData);
-
         GameData gameData = getGame(gameId);
-
         isBlackPlayer = sessionAuthData.username().equals(gameData.blackUsername());
         openWebSocketConnection(gameId, gameData.gameName());
         isObserver = false;
     }
-
     private void observeGame(String[] args) {
         reloadGames();
         if(args.length!=2) {
@@ -389,12 +337,10 @@ public class ChessUI {
             return;
         }
         GameData gameData = getGame(gameId);
-
         openWebSocketConnection(gameId, gameData.gameName());
         isObserver = true;
         isBlackPlayer = false;
     }
-
     private int remapGameId(String gameIdString) {
         int gameId = 0;
         try {
@@ -409,7 +355,6 @@ public class ChessUI {
         }
         return gameId;
     }
-
     private void openWebSocketConnection(int gameId, String gameName) {
         try {
             wsServerFacade = new WSServerFacade(this);
@@ -425,7 +370,6 @@ public class ChessUI {
             handleGeneralException(e);
         }
     }
-
     private GameData getGame(int visualGameId) {
         int serverGameId = gameIdMap.get(visualGameId);
         Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
@@ -436,17 +380,14 @@ public class ChessUI {
         }
         return null;
     }
-
     private void handleBadCommand(String command) {
         if(!command.isEmpty()) {
             System.out.println("Error: " + command + " is not a command. Enter 'help' for available commands");
         }
     }
-
     private void handleBadArgs(String command) {
         System.out.println("Error: Incorrect arguments for command "+command+". Enter 'help' for command usage");
     }
-
     private void handleHttpException(HttpException e) {
         if(e.code == -1) {
             System.out.println("Error: internal error");
@@ -454,16 +395,12 @@ public class ChessUI {
             System.out.println(e.getMessage());
         }
     }
-
     private void handleGeneralException(Exception e) {
         System.out.println(e.getMessage());
     }
-
-
     private void printGameBoard(ChessBoard board, boolean flip) {
         printGameBoard(board, flip, null, null);
     }
-
     private void printGameBoard(ChessBoard board, boolean flip,
                                 ChessPosition startPosition, Collection<ChessMove> moves) {
         boolean isWhite = true;
@@ -536,7 +473,6 @@ public class ChessUI {
         }
     }
 
-
     private String lengthen(String src, int len) {
         StringBuilder out = new StringBuilder(src);
         while(out.length() < len) {
@@ -545,5 +481,4 @@ public class ChessUI {
         out.append("\t");
         return out.toString();
     }
-
 }
