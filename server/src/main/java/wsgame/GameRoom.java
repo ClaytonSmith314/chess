@@ -12,14 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameRoom {
 
 
-    private static final ConcurrentHashMap<GameId, GameRoom> gameIdsToGameRoom = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<GameId, GameRoom> GAME_IDS_TO_GAME_ROOM = new ConcurrentHashMap<>();
 
     public static GameRoom fromGameId(GameId gameId) {
-        return gameIdsToGameRoom.get(gameId);
+        return GAME_IDS_TO_GAME_ROOM.get(gameId);
     }
 
     public GameRoom(GameId gameId, UserConnection rootUser) {
-        gameIdsToGameRoom.put(gameId, this);
+        GAME_IDS_TO_GAME_ROOM.put(gameId, this);
         this.rootUser = rootUser;
         this.gameId = gameId;
     }
@@ -70,7 +70,7 @@ public class GameRoom {
         observers.remove(connection);
 
         if(connectedUsers.isEmpty()) {
-            gameIdsToGameRoom.remove(this.gameId);
+            GAME_IDS_TO_GAME_ROOM.remove(this.gameId);
         }
 
         broadcastNotification("User "+connection.getUsername()+" has left the game", connection);

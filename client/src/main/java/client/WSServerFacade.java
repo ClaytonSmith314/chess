@@ -6,11 +6,10 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 public class WSServerFacade {
 
-    private static final Gson serializer =  new Gson();
+    private static final Gson SERIALIZER =  new Gson();
 
     private final WSClient wsClient;
     private final ChessUI chessUI;
@@ -24,7 +23,7 @@ public class WSServerFacade {
     }
 
     public void handleMessage(String msgJson) {
-        ServerMessage serverMessage = serializer.fromJson(msgJson, ServerMessage.class);
+        ServerMessage serverMessage = SERIALIZER.fromJson(msgJson, ServerMessage.class);
         switch(serverMessage.getServerMessageType()) {
             case LOAD_GAME -> {
                 chessUI.handleLoadGame(serverMessage);
@@ -37,7 +36,7 @@ public class WSServerFacade {
     }
 
     public void send(UserGameCommand command) throws Exception {
-        String msg = serializer.toJson(command, UserGameCommand.class);
+        String msg = SERIALIZER.toJson(command, UserGameCommand.class);
         wsClient.send(msg);
     }
 

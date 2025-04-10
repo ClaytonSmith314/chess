@@ -18,7 +18,7 @@ import dataaccess.*;
 
 public class UserConnection {
 
-    private static final Gson serializer = new Gson();
+    private final Gson serializer = new Gson();
 
     UserGameCommand.UserRole myRole;
 
@@ -70,11 +70,6 @@ public class UserConnection {
         sendString(string);
     }
 
-    public void sendNotification(String message) {
-        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        serverMessage.message = message;
-        send(serverMessage);
-    }
     public void sendError(String message) {
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
         serverMessage.errorMessage = message;

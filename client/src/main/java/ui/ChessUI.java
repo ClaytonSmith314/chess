@@ -17,7 +17,7 @@ import static ui.EscapeSequences.SET_TEXT_ITALIC;
 
 public class ChessUI {
 
-    private static final String colLetters = "abcdefgh";
+    private static final String COL_LETTERS = "abcdefgh";
 
     private ServerFacade serverFacade;
     private final HashMap<Integer, Integer> gameIdMap = new HashMap<>();
@@ -192,11 +192,11 @@ public class ChessUI {
     }
 
     private ChessPosition parseChessPosition(String s) {
-        if(s.length()!=2 || colLetters.indexOf(s.charAt(0))==-1
+        if(s.length()!=2 || COL_LETTERS.indexOf(s.charAt(0))==-1
             || !Character.isDigit(s.charAt(1)) || Integer.parseInt(s.substring(1,2))>8) {
             return null;
         }
-        int col = colLetters.indexOf(s.charAt(0))+1;
+        int col = COL_LETTERS.indexOf(s.charAt(0))+1;
         int row = Integer.parseInt(s.substring(1,2));
         return new ChessPosition(row, col);
     }
@@ -443,7 +443,7 @@ public class ChessUI {
         System.out.print(EscapeSequences.EMPTY);
         for(int j=0; j<8; j++) {
             int col = flip? 7-j : j;
-            System.out.print("\u2003"+colLetters.charAt(col)+" ");
+            System.out.print("\u2003"+ COL_LETTERS.charAt(col)+" ");
         }
         System.out.println(EscapeSequences.EMPTY);
     }

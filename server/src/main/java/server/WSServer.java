@@ -11,14 +11,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebSocket
 public class WSServer {
 
-    private static final ConcurrentHashMap<Session, UserConnection> sessionToUserConnection = new ConcurrentHashMap<>();
-    private static final Gson serializer = new Gson();
+    private static final ConcurrentHashMap<Session, UserConnection> SESSION_TO_USER_CONNECTION = new ConcurrentHashMap<>();
+    private static final Gson SERIALIZER = new Gson();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
-        UserGameCommand userGameCommand = serializer.fromJson(message, UserGameCommand.class);
+        UserGameCommand userGameCommand = SERIALIZER.fromJson(message, UserGameCommand.class);
 
-        UserConnection userConnection = sessionToUserConnection.get(session);
+        UserConnection userConnection = SESSION_TO_USER_CONNECTION.get(session);
         userConnection.onMessage(userGameCommand);
     }
 
@@ -35,6 +35,6 @@ public class WSServer {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        sessionToUserConnection.put(session, new UserConnection(session));
+        SESSION_TO_USER_CONNECTION.put(session, new UserConnection(session));
     }
 }
