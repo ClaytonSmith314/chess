@@ -16,7 +16,7 @@ public class Server {
         Spark.webSocket("/ws", WSServer.class);
 
         // Optional: timeout for idle connections
-        Spark.webSocketIdleTimeoutMillis(60000);
+//        Spark.webSocketIdleTimeoutMillis(60000);
 
         // Register your endpoints and clear exceptions here.
 

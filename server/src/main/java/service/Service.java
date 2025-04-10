@@ -87,7 +87,7 @@ public class Service {
             throw new DataAccessException("Error: bad request");
         }
         if(joinGameData.playerColor().equals("WHITE")) {
-            if(!(gameData.whiteUsername()==null)) {
+            if(!((gameData.whiteUsername()==null)||authData.username().equals(gameData.whiteUsername()))) {
                 throw new DataAccessException("Error: already taken");
             }
             gameData = new GameData(
@@ -100,7 +100,7 @@ public class Service {
             gameDAO.updateGame(gameData);
         }
         else if(joinGameData.playerColor().equals("BLACK")) {
-            if(!(gameData.blackUsername()==null)) {
+            if(!((gameData.blackUsername()==null)||authData.username().equals(gameData.blackUsername()))) {
                 throw new DataAccessException("Error: already taken");
             }
             gameData = new GameData(

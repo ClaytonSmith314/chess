@@ -47,9 +47,11 @@ public class ChessPosition {
         return new ChessPosition(row + dx, col + dy);
     }
 
+    private static final String colVals = "abcdefgh";
     @Override
     public String toString() {
-        return "("+row+","+col+")";
+
+        return colVals.substring(col-1,col)+row;
     }
 
     @Override

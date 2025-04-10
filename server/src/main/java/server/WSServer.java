@@ -2,10 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.*;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.commands.UserGameCommand;
 import wsgame.UserConnection;
 
@@ -27,7 +24,13 @@ public class WSServer {
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
+        System.out.println("Session "+session+" has closed");
+    }
 
+    @OnWebSocketError
+    public void onError(Session session, Throwable error) {
+        System.err.println("WebSocket Error: " + error.getMessage());
+        error.printStackTrace();
     }
 
     @OnWebSocketConnect

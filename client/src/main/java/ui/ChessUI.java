@@ -27,6 +27,7 @@ public class ChessUI {
     private boolean isObserver = false;
     private boolean isBlackPlayer = false;
     private int gameId;
+    private String gameName;
     private WSServerFacade wsServerFacade;
     private GameData gameData;
 
@@ -266,14 +267,16 @@ public class ChessUI {
         }
         GameId gameId = serverFacade.requestCreateGame(
                 sessionAuthData.authToken(), new GameName(args[1]));
-        if(gameIdMap.isEmpty()) {
-            Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
-            for(var game:games) {
-                addNewId(game.gameID());
-            }
-        }
+        reloadGames();
         int visualId = addNewId(gameId.gameID());
         System.out.println("Created game "+args[1]+" with game id "+visualId);
+    }
+
+    private void reloadGames() {
+        Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
+        for(var game:games) {
+            addNewId(game.gameID());
+        }
     }
 
     private void listGames() {
@@ -291,6 +294,7 @@ public class ChessUI {
     }
 
     private void joinGame(String[] args) {
+        reloadGames();
         if(args.length!=3) {
             handleBadArgs(args[0]);
             return;
@@ -313,6 +317,7 @@ public class ChessUI {
     }
 
     private void observeGame(String[] args) {
+        reloadGames();
         if(args.length!=2) {
             handleBadArgs(args[0]);
             return;
@@ -325,8 +330,6 @@ public class ChessUI {
             return;
         }
         GameData gameData = getGame(gameId);
-        boolean flip = gameData.blackUsername()!=null && gameData.blackUsername().equals(sessionAuthData.username());
-        printGameBoard(gameData.game().getBoard(), flip);
 
         openWebSocketConnection(gameId, gameData.gameName());
         isObserver = true;
@@ -361,7 +364,9 @@ public class ChessUI {
     }
 
     private void handleBadCommand(String command) {
-        System.out.println("Error: "+command+" is not a command. Enter 'help' for available commands");
+        if(!command.isEmpty()) {
+            System.out.println("Error: " + command + " is not a command. Enter 'help' for available commands");
+        }
     }
 
     private void handleBadArgs(String command) {
