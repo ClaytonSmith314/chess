@@ -1,7 +1,7 @@
 package client;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
+import ui.ChessUI;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -10,22 +10,23 @@ public class WSServerFacade {
     private static final Gson serializer =  new Gson();
 
     private final WSClient wsClient;
+    private final ChessUI chessUI;
 
 
-
-    public WSServerFacade() throws Exception {
+    public WSServerFacade(ChessUI chessUI) throws Exception {
         wsClient = new WSClient(this);
+        this.chessUI = chessUI;
     }
 
     public void handleMessage(String msgJson) {
-        ServerMessage msg = serializer.fromJson(msgJson, ServerMessage.class);
-        switch(msg.getServerMessageType()) {
+        System.out.println(msgJson);
+        ServerMessage serverMessage = serializer.fromJson(msgJson, ServerMessage.class);
+        switch(serverMessage.getServerMessageType()) {
             case LOAD_GAME -> {
+                chessUI.handleLoadGame(serverMessage);
             }
-            case ERROR -> {
-            }
-            case NOTIFICATION -> {
-                System.out.print("\n"+msg.notificationMsg);
+            case ERROR, NOTIFICATION -> {
+                chessUI.handleServerNotificationOrError(serverMessage);
             }
         }
     }

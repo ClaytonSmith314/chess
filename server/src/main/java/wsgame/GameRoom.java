@@ -1,7 +1,6 @@
 package wsgame;
 
 import model.GameId;
-import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
@@ -30,35 +29,39 @@ public class GameRoom {
     UserConnection whiteUser;
     UserConnection blackUser;
 
-    Collection<UserConnection> observers;
+    private final Collection<UserConnection> observers = new ArrayList<>();
 
-    Collection<UserConnection> connectedUsers = new ArrayList<>();
+    private final Collection<UserConnection> connectedUsers = new ArrayList<>();
 
-    public void addUser(UserConnection connection, UserGameCommand.UserRole role) {
+    public void addUser(UserConnection connection) {
         connectedUsers.add(connection);
-        if(role!=null) {
-            switch (role) {
-                case WHITE_PLAYER -> {
-                    whiteUser = connection;
-                    broadcastNotification("User " + connection.getUsername() + " joined as the white player.");
-                }
-                case BLACK_PLAYER -> {
-                    blackUser = connection;
-                    broadcastNotification("User " + connection.getUsername() + " joined as the black player.");
-                }
-                case OBSERVER -> {
-                    observers.add(connection);
-                    broadcastNotification("User " + connection.getUsername() + " joined as an observer.");
-                }
+        switch (connection.myRole) {
+            case WHITE_PLAYER -> {
+                whiteUser = connection;
+                broadcastNotification("User " + connection.getUsername() + " joined as the white player.",
+                connection);
+            }
+            case BLACK_PLAYER -> {
+                blackUser = connection;
+                broadcastNotification("User " + connection.getUsername() + " joined as the black player.",
+                        connection);
+            }
+            case OBSERVER -> {
+                observers.add(connection);
+                broadcastNotification("User " + connection.getUsername() + " joined as an observer.",
+                        connection);
             }
         }
     }
 
-    public void broadcastNotification(String message) {
+    public void broadcastNotification(String message, UserConnection excluded) {
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        serverMessage.notificationMsg = message;
+        serverMessage.message = message;
 
         for(var connection: connectedUsers) {
+            if(connection==excluded) {
+                continue;
+            }
             connection.send(serverMessage);
         }
     }

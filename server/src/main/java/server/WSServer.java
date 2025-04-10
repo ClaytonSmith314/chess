@@ -18,7 +18,7 @@ public class WSServer {
     private static final Gson serializer = new Gson();
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws Exception {
+    public void onMessage(Session session, String message) {
         UserGameCommand userGameCommand = serializer.fromJson(message, UserGameCommand.class);
 
         UserConnection userConnection = sessionToUserConnection.get(session);
@@ -32,7 +32,6 @@ public class WSServer {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        System.out.println("WebSocket connected: " + session);
         sessionToUserConnection.put(session, new UserConnection(session));
     }
 }

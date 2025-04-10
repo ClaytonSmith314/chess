@@ -18,8 +18,6 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
-    public String username = null;
-    public UserRole userRole = null;
     public ChessPosition p1 = null;
     public ChessPosition p2 = null;
 

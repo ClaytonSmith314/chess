@@ -9,8 +9,8 @@ import client.ServerFacade;
 import client.WSServerFacade;
 import model.*;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -134,7 +134,14 @@ public class ChessUI {
 
     }
 
+    public void handleServerNotificationOrError(ServerMessage serverMessage) {
+        System.out.println(serverMessage.message);
+        System.out.print("[IN GAME "+gameName+"] >>> ");
+    }
 
+    public void handleLoadGame(ServerMessage serverMessage) {
+        printGameBoard(serverMessage.game, false);
+    }
 
 
 
@@ -232,15 +239,11 @@ public class ChessUI {
 
         //TODO: Create web socket here
         try {
-            wsServerFacade = new WSServerFacade();
+            wsServerFacade = new WSServerFacade(this);
             UserGameCommand command = new UserGameCommand(
                     UserGameCommand.CommandType.CONNECT,
                     sessionAuthData.authToken(),
                     gameId);
-            command.userRole = args[2].equals("WHITE")?
-                    UserGameCommand.UserRole.WHITE_PLAYER :
-                    UserGameCommand.UserRole.BLACK_PLAYER;
-            command.username = sessionAuthData.username();
             wsServerFacade.send(command);
             gamePlayMode = true;
             isObserver = false;
