@@ -15,6 +15,8 @@ public class WSServerFacade {
     private final WSClient wsClient;
     private final ChessUI chessUI;
 
+    private boolean waitingForMessage = false;
+
 
     public WSServerFacade(ChessUI chessUI) throws Exception {
         wsClient = new WSClient(this);
@@ -31,11 +33,28 @@ public class WSServerFacade {
                 chessUI.handleServerNotificationOrError(serverMessage);
             }
         }
+        waitingForMessage = false;
     }
 
     public void send(UserGameCommand command) throws Exception {
         String msg = serializer.toJson(command, UserGameCommand.class);
         wsClient.send(msg);
+    }
+
+    public void waitForMessage() {
+        waitingForMessage = true;
+        try {
+            while (waitingForMessage) {
+                Thread.sleep(80);
+            }
+        } catch(InterruptedException e) {
+            waitingForMessage = false;
+        }
+    }
+
+    public void sendAndWait(UserGameCommand command) throws Exception {
+        send(command);
+        waitForMessage();
     }
 
     public void close() throws IOException, InterruptedException {

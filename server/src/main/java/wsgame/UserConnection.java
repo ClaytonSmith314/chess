@@ -116,7 +116,7 @@ public class UserConnection {
         }
 
         gameDAO.updateGame(gameData);
-        gameRoom.broadcastNotification("User "+username+" has made move "+move, null);
+        gameRoom.broadcastNotification("User "+username+" has made move "+move, this);
         gameRoom.broadcastGame(gameData, null);
     }
 

@@ -25,7 +25,7 @@ public class ChessUI {
 
     private boolean gamePlayMode = false;
     private boolean isObserver = false;
-    private String gameName = null;
+    private boolean isBlackPlayer = false;
     private int gameId;
     private WSServerFacade wsServerFacade;
     private GameData gameData;
@@ -56,7 +56,7 @@ public class ChessUI {
     public boolean executePrompt() {
         if (loggedIn) {
             if(gamePlayMode) {
-                System.out.print("[IN GAME "+gameName+"] >>> ");
+                System.out.print("[IN_GAME] >>> ");
             } else {
                 System.out.print("[LOGGED_IN] >>> ");
             }
@@ -147,13 +147,12 @@ public class ChessUI {
     }
 
     private void leave() throws Exception {
+        gamePlayMode = false;
         UserGameCommand command = new UserGameCommand(
                 UserGameCommand.CommandType.LEAVE,
                 sessionAuthData.authToken(),
                 gameId);
         wsServerFacade.send(command);
-
-        gamePlayMode = false;
         wsServerFacade.close();
     }
 
@@ -175,7 +174,7 @@ public class ChessUI {
                 gameId
         );
         command.move = move;
-        wsServerFacade.send(command);
+        wsServerFacade.sendAndWait(command);
     }
 
     private ChessPosition parseChessPosition(String s) {
@@ -189,14 +188,12 @@ public class ChessUI {
     }
 
     private void redraw() {
-        printGameBoard(gameData.game().getBoard(), false);
+        printGameBoard(gameData.game().getBoard(), isBlackPlayer&&(!isObserver));
     }
 
     public void handleServerNotificationOrError(ServerMessage serverMessage) {
-        System.out.println();
         System.out.println((serverMessage.getServerMessageType()== ServerMessage.ServerMessageType.ERROR)?
                 serverMessage.errorMessage: serverMessage.message);
-        System.out.print("[IN GAME "+gameName+"] >>> ");
     }
 
     public void handleLoadGame(ServerMessage serverMessage) {
@@ -205,10 +202,9 @@ public class ChessUI {
             System.out.print(serverMessage.message);
         }
         this.gameData = serverMessage.game;
-        System.out.println("\nWhite Player: "+serverMessage.game.whiteUsername());
+        System.out.println("White Player: "+serverMessage.game.whiteUsername());
         System.out.println("Black Player: "+serverMessage.game.blackUsername());
-        printGameBoard(serverMessage.game.game().getBoard(), false);
-        System.out.print("[IN GAME "+gameName+"] >>> ");
+        redraw();
     }
 
 
@@ -311,6 +307,7 @@ public class ChessUI {
 
         GameData gameData = getGame(gameId);
 
+        isBlackPlayer = sessionAuthData.username().equals(gameData.blackUsername());
         openWebSocketConnection(gameId, gameData.gameName());
         isObserver = false;
     }
@@ -333,6 +330,7 @@ public class ChessUI {
 
         openWebSocketConnection(gameId, gameData.gameName());
         isObserver = true;
+        isBlackPlayer = false;
     }
 
     private void openWebSocketConnection(int gameId, String gameName) {
@@ -342,7 +340,7 @@ public class ChessUI {
                     UserGameCommand.CommandType.CONNECT,
                     sessionAuthData.authToken(),
                     gameId);
-            wsServerFacade.send(command);
+            wsServerFacade.sendAndWait(command);
             gamePlayMode = true;
             this.gameName = gameName;
             this.gameId = gameId;
