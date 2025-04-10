@@ -28,8 +28,6 @@ public class UserConnection {
     private String username;
     private String authToken;
 
-    private boolean gameOver = false;
-
     public UserConnection(Session session) {
         this.session = session;
     }
@@ -102,7 +100,7 @@ public class UserConnection {
             sendError("Error: Observers cannot make moves");
             return;
         }
-        if(gameOver) {
+        if(gameData.game().isGameOver()) {
             sendError("Error: You cannot make a move because the game is over");
             return;
         }
@@ -130,12 +128,14 @@ public class UserConnection {
         var game = gameData.game();
         if(game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
             gameRoom.broadcastNotification("White King is in Checkmate. Black wins! Game over.", null);
-            gameOver = true;
+            gameData.game().endGame();
+            gameDAO.updateGame(gameData);
             return;
         }
         if(game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
             gameRoom.broadcastNotification("Black King is in Checkmate. White wins! Game over.", null);
-            gameOver = true;
+            gameData.game().endGame();
+            gameDAO.updateGame(gameData);
             return;
         }
 
@@ -153,11 +153,18 @@ public class UserConnection {
         AuthData authData = authDAO.getAuth(userGameCommand.getAuthToken());
         GameData gameData = gameDAO.getGame(userGameCommand.getGameID());
 
+        if(gameData.game().isGameOver()) {
+            sendError("Error: you cannot resign because the game is over");
+            return;
+        }
+
         if(authData.username().equals(gameData.whiteUsername())) {
-            gameOver = true;
+            gameData.game().endGame();
+            gameDAO.updateGame(gameData);
             gameRoom.broadcastNotification("User "+authData.username()+" has resigned. Black wins! Game Over.", null);
         } else if(authData.username().equals(gameData.blackUsername())) {
-            gameOver = true;
+            gameData.game().endGame();
+            gameDAO.updateGame(gameData);
             gameRoom.broadcastNotification("User "+authData.username()+" has resigned. White wins! Game Over.", null);
         } else {
             sendError("Error: only players can resign");

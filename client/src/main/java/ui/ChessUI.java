@@ -13,6 +13,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Scanner;
 
+import static ui.EscapeSequences.RESET_TEXT_ITALIC;
+import static ui.EscapeSequences.SET_TEXT_ITALIC;
+
 public class ChessUI {
 
     private static final String colLetters = "abcdefgh";
@@ -298,7 +301,11 @@ public class ChessUI {
             int visualId = addNewId(game.gameID());
             String whiteUsername = (game.whiteUsername()==null)? "": game.whiteUsername();
             String blackUsername = (game.blackUsername()==null)? "": game.blackUsername();
-            System.out.println(visualId+"\t|  "+lengthen(game.gameName(),10)+"|  "
+            String gameName = game.gameName();
+            if(game.game().isGameOver()) {
+                gameName = gameName + SET_TEXT_ITALIC+" (finished)"+RESET_TEXT_ITALIC;
+            }
+            System.out.println(visualId+"\t|  "+lengthen(gameName,10)+"|  "
                 +lengthen(whiteUsername, 10)+"|  "+lengthen(blackUsername,10)+"|");
         }
         System.out.println();

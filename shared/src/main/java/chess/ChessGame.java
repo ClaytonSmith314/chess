@@ -18,6 +18,14 @@ public class ChessGame {
     private ChessPosition whiteKingPosition;
     private ChessPosition blackKingPosition;
 
+    private boolean gameOver = false;
+    public boolean isGameOver() {
+        return gameOver;
+    }
+    public void endGame() {
+        gameOver = true;
+    }
+
     private Collection<ChessPosition> getEndPosition(Collection<ChessMove> moves) {
         Collection<ChessPosition> positions = new ArrayList<ChessPosition>();
         for(ChessMove move: moves) {
