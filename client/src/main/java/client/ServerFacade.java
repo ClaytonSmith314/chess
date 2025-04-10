@@ -27,12 +27,12 @@ public class ServerFacade {
     
     public AuthData requestLogin(LoginData loginData) throws HttpException {
         String body = serializer.toJson(loginData);
-        String resp = client.sendHttpRequest("/wsgame", HttpClient.POST, null, body);
+        String resp = client.sendHttpRequest("/session", HttpClient.POST, null, body);
         return serializer.fromJson(resp, AuthData.class);
     }
 
     public void requestLogout(String authToken) throws HttpException {
-        client.sendHttpRequest("/wsgame", HttpClient.DELETE, authToken, null);
+        client.sendHttpRequest("/session", HttpClient.DELETE, authToken, null);
     }
     
     public Collection<GameData> requestListGames(String authToken) throws HttpException {

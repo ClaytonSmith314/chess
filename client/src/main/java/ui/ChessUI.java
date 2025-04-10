@@ -8,6 +8,7 @@ import client.HttpException;
 import client.ServerFacade;
 import client.WSServerFacade;
 import model.*;
+import websocket.commands.UserGameCommand;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ public class ChessUI {
 
     private boolean gamePlayMode = false;
     private boolean isObserver = false;
+    private String gameName = null;
     private WSServerFacade wsServerFacade;
 
 
@@ -51,7 +53,11 @@ public class ChessUI {
 
     public boolean executePrompt() {
         if (loggedIn) {
-            System.out.print("[LOGGED_IN] >>> ");
+            if(gamePlayMode) {
+                System.out.print("[IN GAME "+gameName+"] >>> ");
+            } else {
+                System.out.print("[LOGGED_IN] >>> ");
+            }
         } else {
             System.out.print("[LOGGED_OUT] >>> ");
         }
@@ -225,15 +231,20 @@ public class ChessUI {
         GameData gameData = getGame(gameId);
 
         //TODO: Create web socket here
+        try {
+            wsServerFacade = new WSServerFacade();
+            UserGameCommand command = new UserGameCommand(
+                    UserGameCommand.CommandType.CONNECT,
+                    sessionAuthData.authToken(),
+                    gameId);
+            wsServerFacade.send(command);
+            gamePlayMode = true;
+            isObserver = false;
+            gameName = gameData.gameName();
+        } catch (Exception e) {
+            handleGeneralException(e);
+        }
 
-
-
-        System.out.println("Joined game "+gameData.gameName()+" with id "+gameId+" as team "+args[2]);
-
-//        printGameBoard(gameData.game().getBoard(), args[2].equals("BLACK"));
-
-        printGameBoard(gameData.game().getBoard(), false);
-        printGameBoard(gameData.game().getBoard(), true);
     }
 
     private void observeGame(String[] args) {
@@ -278,6 +289,10 @@ public class ChessUI {
         } else {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void handleGeneralException(Exception e) {
+        System.out.println(e.getMessage());
     }
 
 
