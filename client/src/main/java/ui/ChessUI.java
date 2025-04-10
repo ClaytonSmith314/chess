@@ -79,6 +79,8 @@ public class ChessUI {
                     redraw();
                 } else if (args[0].equals("move")) {
                     move(args);
+                } else if(args[0].equals("resign")) {
+                    resign();
                 } else {
                     handleBadCommand(args[0]);
                 }
@@ -175,6 +177,15 @@ public class ChessUI {
                 gameId
         );
         command.move = move;
+        wsServerFacade.sendAndWait(command);
+    }
+
+    private void resign() throws Exception {
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.RESIGN,
+                sessionAuthData.authToken(),
+                gameId
+        );
         wsServerFacade.sendAndWait(command);
     }
 
@@ -299,11 +310,8 @@ public class ChessUI {
             handleBadArgs(args[0]);
             return;
         }
-        int gameId = 0;
-        try {
-            gameId = gameIdMap.get(Integer.valueOf(args[1]));
-        } catch(NumberFormatException e) {
-            handleBadArgs(args[0]);
+        int gameId = remapGameId(args[1]);
+        if(gameId==-1){
             return;
         }
         var joinGameData = new JoinGameData(args[2], gameId);
@@ -322,11 +330,8 @@ public class ChessUI {
             handleBadArgs(args[0]);
             return;
         }
-        int gameId = 0;
-        try {
-            gameId = Integer.parseInt(args[1]);
-        } catch(NumberFormatException e) {
-            handleBadArgs(args[0]);
+        int gameId = remapGameId(args[1]);
+        if(gameId==-1){
             return;
         }
         GameData gameData = getGame(gameId);
@@ -334,6 +339,21 @@ public class ChessUI {
         openWebSocketConnection(gameId, gameData.gameName());
         isObserver = true;
         isBlackPlayer = false;
+    }
+
+    private int remapGameId(String gameIdString) {
+        int gameId = 0;
+        try {
+            if(gameIdMap.get(Integer.valueOf(gameIdString))==null) {
+                System.out.println("Error: no game with that id");
+                return -1;
+            }
+            gameId = gameIdMap.get(Integer.valueOf(gameIdString));
+        } catch(NumberFormatException e) {
+            handleBadArgs(gameIdString);
+            return -1;
+        }
+        return gameId;
     }
 
     private void openWebSocketConnection(int gameId, String gameName) {

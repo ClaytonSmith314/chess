@@ -28,6 +28,8 @@ public class UserConnection {
     private String username;
     private String authToken;
 
+    private boolean gameOver = false;
+
     public UserConnection(Session session) {
         this.session = session;
     }
@@ -45,6 +47,7 @@ public class UserConnection {
                     leave(userGameCommand);
                 }
                 case RESIGN -> {
+                    resign(userGameCommand);
                 }
             }
         } catch(DataAccessException dataAccessException) {
@@ -99,6 +102,10 @@ public class UserConnection {
             sendError("Error: Observers cannot make moves");
             return;
         }
+        if(gameOver) {
+            sendError("Error: You cannot make a move because the game is over");
+            return;
+        }
         if(piece==null) {
             sendError("Error: Start position is empty");
             return;
@@ -118,6 +125,43 @@ public class UserConnection {
         gameDAO.updateGame(gameData);
         gameRoom.broadcastNotification("User "+username+" moved "+move, this);
         gameRoom.broadcastGame(gameData, null);
+
+
+        var game = gameData.game();
+        if(game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            gameRoom.broadcastNotification("White King is in Checkmate. Black wins! Game over.", null);
+            gameOver = true;
+            return;
+        }
+        if(game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            gameRoom.broadcastNotification("Black King is in Checkmate. White wins! Game over.", null);
+            gameOver = true;
+            return;
+        }
+
+        if(gameData.game().isInCheck(ChessGame.TeamColor.WHITE)) {
+            gameRoom.broadcastNotification("White King is in Check", null);
+        }
+        if(gameData.game().isInCheck(ChessGame.TeamColor.BLACK)) {
+            gameRoom.broadcastNotification("Black King is in Check", null);
+        }
+    }
+
+    public void resign(UserGameCommand userGameCommand) throws DataAccessException {
+        AuthDAO authDAO = new SQLAuthDAO();
+        GameDAO gameDAO = new SQLGameDAO();
+        AuthData authData = authDAO.getAuth(userGameCommand.getAuthToken());
+        GameData gameData = gameDAO.getGame(userGameCommand.getGameID());
+
+        if(authData.username().equals(gameData.whiteUsername())) {
+            gameOver = true;
+            gameRoom.broadcastNotification("User "+authData.username()+" has resigned. Black wins! Game Over.", null);
+        } else if(authData.username().equals(gameData.blackUsername())) {
+            gameOver = true;
+            gameRoom.broadcastNotification("User "+authData.username()+" has resigned. White wins! Game Over.", null);
+        } else {
+            sendError("Error: only players can resign");
+        }
     }
 
     public void connect(UserGameCommand userGameCommand) throws DataAccessException {
