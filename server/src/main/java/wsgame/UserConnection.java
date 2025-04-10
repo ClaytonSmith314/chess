@@ -43,7 +43,7 @@ public class UserConnection {
             }
         } catch(DataAccessException dataAccessException) {
             ServerMessage errMsg = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
-            errMsg.message = dataAccessException.getMessage();
+            errMsg.errorMessage = dataAccessException.getMessage();
             send(errMsg);
         }
     }

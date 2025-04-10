@@ -237,21 +237,7 @@ public class ChessUI {
 
         GameData gameData = getGame(gameId);
 
-        //TODO: Create web socket here
-        try {
-            wsServerFacade = new WSServerFacade(this);
-            UserGameCommand command = new UserGameCommand(
-                    UserGameCommand.CommandType.CONNECT,
-                    sessionAuthData.authToken(),
-                    gameId);
-            wsServerFacade.send(command);
-            gamePlayMode = true;
-            isObserver = false;
-            gameName = gameData.gameName();
-        } catch (Exception e) {
-            handleGeneralException(e);
-        }
-
+        openWebSocketConnection(gameId, gameData.gameName());
     }
 
     private void observeGame(String[] args) {
@@ -261,7 +247,7 @@ public class ChessUI {
         }
         int gameId = 0;
         try {
-            gameId = Integer.valueOf(args[1]);
+            gameId = Integer.parseInt(args[1]);
         } catch(NumberFormatException e) {
             handleBadArgs(args[0]);
             return;
@@ -269,6 +255,24 @@ public class ChessUI {
         GameData gameData = getGame(gameId);
         boolean flip = gameData.blackUsername()!=null && gameData.blackUsername().equals(sessionAuthData.username());
         printGameBoard(gameData.game().getBoard(), flip);
+
+        openWebSocketConnection(gameId, gameData.gameName());
+    }
+
+    private void openWebSocketConnection(int gameId, String gameName) {
+        try {
+            wsServerFacade = new WSServerFacade(this);
+            UserGameCommand command = new UserGameCommand(
+                    UserGameCommand.CommandType.CONNECT,
+                    sessionAuthData.authToken(),
+                    gameId);
+            wsServerFacade.send(command);
+            gamePlayMode = true;
+            isObserver = false;
+            this.gameName = gameName;
+        } catch (Exception e) {
+            handleGeneralException(e);
+        }
     }
 
     private GameData getGame(int visualGameId) {

@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 public class ServerMessage {
     ServerMessageType serverMessageType;
+    public String errorMessage;
     public String message;
     public ChessBoard game = null;
 
