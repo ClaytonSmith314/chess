@@ -133,6 +133,18 @@ public class UserConnection {
             gameDAO.updateGame(gameData);
             return;
         }
+        if(game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+            gameRoom.broadcastNotification("White King is in Stalemate. It is a tie. Game over.", null);
+            gameData.game().endGame();
+            gameDAO.updateGame(gameData);
+            return;
+        }
+        if(game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+            gameRoom.broadcastNotification("Black King is in Stalemate. It is a tie. Game over.", null);
+            gameData.game().endGame();
+            gameDAO.updateGame(gameData);
+            return;
+        }
 
         if(gameData.game().isInCheck(ChessGame.TeamColor.WHITE)) {
             gameRoom.broadcastNotification("White King is in Check", null);
