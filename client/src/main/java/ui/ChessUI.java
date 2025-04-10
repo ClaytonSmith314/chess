@@ -8,6 +8,7 @@ import client.HttpException;
 import client.ServerFacade;
 import client.WSServerFacade;
 import model.*;
+import org.eclipse.jetty.server.Authentication;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -26,6 +27,7 @@ public class ChessUI {
     private boolean gamePlayMode = false;
     private boolean isObserver = false;
     private String gameName = null;
+    private int gameId;
     private WSServerFacade wsServerFacade;
 
 
@@ -70,6 +72,10 @@ public class ChessUI {
             if(gamePlayMode) {
                 if(args[0].equals("help")) {
                     helpInGamePlay();
+                } else if (args[0].equals("leave")) {
+                    leave();
+                } else {
+                    handleBadCommand(args[0]);
                 }
             } else if(loggedIn) {
                 if(args[0].equals("help")) {
@@ -105,6 +111,8 @@ public class ChessUI {
             }
         } catch(HttpException e) {
             handleHttpException(e);
+        } catch (Exception e) {
+            handleGeneralException(e);
         }
 
         return true;
@@ -130,17 +138,27 @@ public class ChessUI {
         }
     }
 
-    private void leave() {
+    private void leave() throws Exception {
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.LEAVE,
+                sessionAuthData.authToken(),
+                gameId);
+        wsServerFacade.send(command);
 
+        wsServerFacade.close();
+
+        gamePlayMode = false;
     }
 
     public void handleServerNotificationOrError(ServerMessage serverMessage) {
-        System.out.println(serverMessage.message);
+        System.out.println((serverMessage.getServerMessageType()== ServerMessage.ServerMessageType.ERROR)?
+                serverMessage.errorMessage: serverMessage.message);
         System.out.print("[IN GAME "+gameName+"] >>> ");
     }
 
     public void handleLoadGame(ServerMessage serverMessage) {
         printGameBoard(serverMessage.game, false);
+        System.out.print("[IN GAME "+gameName+"] >>> ");
     }
 
 
@@ -268,8 +286,9 @@ public class ChessUI {
                     gameId);
             wsServerFacade.send(command);
             gamePlayMode = true;
-            isObserver = false;
+            isObserver = true;
             this.gameName = gameName;
+            this.gameId = gameId;
         } catch (Exception e) {
             handleGeneralException(e);
         }
@@ -330,7 +349,6 @@ public class ChessUI {
             isWhite = !isWhite;
         }
         drawCols(flip);
-        System.out.println();
     }
 
     private void drawCols(boolean flip) {

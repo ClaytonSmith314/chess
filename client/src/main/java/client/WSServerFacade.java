@@ -5,6 +5,8 @@ import ui.ChessUI;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
+import java.io.IOException;
+
 public class WSServerFacade {
 
     private static final Gson serializer =  new Gson();
@@ -19,7 +21,6 @@ public class WSServerFacade {
     }
 
     public void handleMessage(String msgJson) {
-        System.out.println(msgJson);
         ServerMessage serverMessage = serializer.fromJson(msgJson, ServerMessage.class);
         switch(serverMessage.getServerMessageType()) {
             case LOAD_GAME -> {
@@ -34,6 +35,10 @@ public class WSServerFacade {
     public void send(UserGameCommand command) throws Exception {
         String msg = serializer.toJson(command, UserGameCommand.class);
         wsClient.send(msg);
+    }
+
+    public void close() throws IOException {
+        wsClient.stop();
     }
 
 

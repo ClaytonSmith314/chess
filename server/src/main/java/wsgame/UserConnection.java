@@ -37,6 +37,7 @@ public class UserConnection {
                 case MAKE_MOVE -> {
                 }
                 case LEAVE -> {
+                    leave(userGameCommand);
                 }
                 case RESIGN -> {
                 }
@@ -92,6 +93,38 @@ public class UserConnection {
         ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
         message.game = gameData.game().getBoard();
         send(message);
+    }
+
+    public void leave(UserGameCommand userGameCommand) throws DataAccessException {
+        AuthDAO authDAO = new SQLAuthDAO();
+        GameDAO gameDAO = new SQLGameDAO();
+        AuthData authData = authDAO.getAuth(userGameCommand.getAuthToken());
+        GameData gameData = gameDAO.getGame(userGameCommand.getGameID());
+
+        removeUserFromGame(authData.username(), gameData, gameDAO);
+
+        gameRoom.removeUser(this);
+    }
+
+    private void removeUserFromGame(String username, GameData gameData, GameDAO gameDAO)
+    throws DataAccessException {
+        if(username.equals(gameData.blackUsername())) {
+            gameDAO.updateGame(new GameData(
+                    gameData.gameID(),
+                    gameData.whiteUsername(),
+                    null,
+                    gameData.gameName(),
+                    gameData.game()
+            ));
+        } else if(username.equals(gameData.whiteUsername())) {
+            gameDAO.updateGame(new GameData(
+                    gameData.gameID(),
+                    null,
+                    gameData.blackUsername(),
+                    gameData.gameName(),
+                    gameData.game()
+            ));
+        }
     }
 
 

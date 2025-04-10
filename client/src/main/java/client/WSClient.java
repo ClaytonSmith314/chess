@@ -1,6 +1,7 @@
 package client;
 
 import javax.websocket.*;
+import java.io.IOException;
 import java.net.URI;
 
 public class WSClient extends Endpoint {
@@ -24,6 +25,10 @@ public class WSClient extends Endpoint {
 
     public void send(String msg) throws Exception {
         this.session.getBasicRemote().sendText(msg);
+    }
+
+    public void stop() throws IOException {
+        session.close();
     }
 
     public void onOpen(Session session, EndpointConfig endpointConfig) {

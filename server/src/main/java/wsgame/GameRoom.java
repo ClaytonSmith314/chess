@@ -5,6 +5,7 @@ import websocket.messages.ServerMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameRoom {
@@ -52,6 +53,26 @@ public class GameRoom {
                         connection);
             }
         }
+    }
+
+    public void removeUser(UserConnection connection) {
+        if(Objects.equals(connection, whiteUser)) {
+            whiteUser = null;
+        }
+        if(Objects.equals(connection, blackUser)) {
+            blackUser = null;
+        }
+        if(Objects.equals(connection, rootUser)) {
+            rootUser = null;
+        }
+        connectedUsers.remove(connection);
+        observers.remove(connection);
+
+        if(connectedUsers.isEmpty()) {
+            gameIdsToGameRoom.remove(this.gameId);
+        }
+
+        broadcastNotification("User "+connection.getUsername()+" has left the game", connection);
     }
 
     public void broadcastNotification(String message, UserConnection excluded) {
