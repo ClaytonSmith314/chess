@@ -1,5 +1,6 @@
 package wsgame;
 
+import model.GameData;
 import model.GameId;
 import websocket.messages.ServerMessage;
 
@@ -78,7 +79,14 @@ public class GameRoom {
     public void broadcastNotification(String message, UserConnection excluded) {
         ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
         serverMessage.message = message;
-
+        broadcast(serverMessage, excluded);
+    }
+    public void broadcastGame(GameData gameData, UserConnection excluded) {
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
+        serverMessage.game = gameData;
+        broadcast(serverMessage, excluded);
+    }
+    public void broadcast(ServerMessage serverMessage, UserConnection excluded) {
         for(var connection: connectedUsers) {
             if(connection==excluded) {
                 continue;

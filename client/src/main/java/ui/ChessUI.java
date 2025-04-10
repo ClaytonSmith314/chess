@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import client.HttpException;
 import client.ServerFacade;
 import client.WSServerFacade;
@@ -18,6 +15,8 @@ import java.util.Scanner;
 
 public class ChessUI {
 
+    private static final String colLetters = "abcdefgh";
+
     private ServerFacade serverFacade;
     private final HashMap<Integer, Integer> gameIdMap = new HashMap<>();
 
@@ -29,6 +28,7 @@ public class ChessUI {
     private String gameName = null;
     private int gameId;
     private WSServerFacade wsServerFacade;
+    private GameData gameData;
 
 
     private int addNewId(int dbId) {
@@ -74,6 +74,10 @@ public class ChessUI {
                     helpInGamePlay();
                 } else if (args[0].equals("leave")) {
                     leave();
+                } else if (args[0].equals("redraw")) {
+                    redraw();
+                } else if (args[0].equals("move")) {
+                    move(args);
                 } else {
                     handleBadCommand(args[0]);
                 }
@@ -111,6 +115,8 @@ public class ChessUI {
             }
         } catch(HttpException e) {
             handleHttpException(e);
+        } catch(RuntimeException e) {
+
         } catch (Exception e) {
             handleGeneralException(e);
         }
@@ -126,14 +132,16 @@ public class ChessUI {
                     showmoves <ROW><COL> - show the legal moves of the piece at that location
                     redraw - redraw the chess board
                     leave - stop observing the game
+                    help - with commands
                     """);
         } else {
             System.out.println("""
-                    move <START ROW><START COL> <END ROW><END COL> - move a chess piece if it's your turn
+                    move <START POSITION> <END POSITION> - move a chess piece if it's your turn
                     showmoves <ROW><COL> - show the legal moves at the column
                     redraw - redraw the chess board
                     resign - forfeit the game
                     leave - stop observing the game
+                    help - with commands
                     """);
         }
     }
@@ -145,19 +153,61 @@ public class ChessUI {
                 gameId);
         wsServerFacade.send(command);
 
-        wsServerFacade.close();
-
         gamePlayMode = false;
+        wsServerFacade.close();
+    }
+
+    private void move(String[] args) throws Exception {
+        var startPosition = parseChessPosition(args[1]);
+        var endPosition = parseChessPosition(args[2]);
+        if (startPosition==null || endPosition==null) {
+            handleBadArgs("move");
+            return;
+        }
+        ChessMove move = new ChessMove(
+                startPosition,
+                endPosition,
+                null
+        );
+        UserGameCommand command = new UserGameCommand(
+                UserGameCommand.CommandType.MAKE_MOVE,
+                sessionAuthData.authToken(),
+                gameId
+        );
+        command.move = move;
+        wsServerFacade.send(command);
+    }
+
+    private ChessPosition parseChessPosition(String s) {
+        if(s.length()!=2 || colLetters.indexOf(s.charAt(0))==-1
+            || !Character.isDigit(s.charAt(1)) || Integer.parseInt(s.substring(1,2))>8) {
+            return null;
+        }
+        int col = colLetters.indexOf(s.charAt(0))+1;
+        int row = Integer.parseInt(s.substring(1,2));
+        return new ChessPosition(row, col);
+    }
+
+    private void redraw() {
+        printGameBoard(gameData.game().getBoard(), false);
     }
 
     public void handleServerNotificationOrError(ServerMessage serverMessage) {
+        System.out.println();
         System.out.println((serverMessage.getServerMessageType()== ServerMessage.ServerMessageType.ERROR)?
                 serverMessage.errorMessage: serverMessage.message);
         System.out.print("[IN GAME "+gameName+"] >>> ");
     }
 
     public void handleLoadGame(ServerMessage serverMessage) {
-        printGameBoard(serverMessage.game, false);
+        if(serverMessage.message != null) {
+            System.out.println();
+            System.out.print(serverMessage.message);
+        }
+        this.gameData = serverMessage.game;
+        System.out.println("\nWhite Player: "+serverMessage.game.whiteUsername());
+        System.out.println("Black Player: "+serverMessage.game.blackUsername());
+        printGameBoard(serverMessage.game.game().getBoard(), false);
         System.out.print("[IN GAME "+gameName+"] >>> ");
     }
 
@@ -220,6 +270,12 @@ public class ChessUI {
         }
         GameId gameId = serverFacade.requestCreateGame(
                 sessionAuthData.authToken(), new GameName(args[1]));
+        if(gameIdMap.isEmpty()) {
+            Collection<GameData> games = serverFacade.requestListGames(sessionAuthData.authToken());
+            for(var game:games) {
+                addNewId(game.gameID());
+            }
+        }
         int visualId = addNewId(gameId.gameID());
         System.out.println("Created game "+args[1]+" with game id "+visualId);
     }
@@ -256,6 +312,7 @@ public class ChessUI {
         GameData gameData = getGame(gameId);
 
         openWebSocketConnection(gameId, gameData.gameName());
+        isObserver = false;
     }
 
     private void observeGame(String[] args) {
@@ -275,6 +332,7 @@ public class ChessUI {
         printGameBoard(gameData.game().getBoard(), flip);
 
         openWebSocketConnection(gameId, gameData.gameName());
+        isObserver = true;
     }
 
     private void openWebSocketConnection(int gameId, String gameName) {
@@ -286,7 +344,6 @@ public class ChessUI {
                     gameId);
             wsServerFacade.send(command);
             gamePlayMode = true;
-            isObserver = true;
             this.gameName = gameName;
             this.gameId = gameId;
         } catch (Exception e) {
@@ -354,7 +411,6 @@ public class ChessUI {
     private void drawCols(boolean flip) {
         System.out.print(EscapeSequences.RESET_TEXT_COLOR);
         System.out.print(EscapeSequences.RESET_BG_COLOR);
-        String colLetters = "abcdefgh";
         System.out.print(EscapeSequences.EMPTY);
         for(int j=0; j<8; j++) {
             int col = flip? 7-j : j;

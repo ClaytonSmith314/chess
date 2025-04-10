@@ -27,7 +27,8 @@ public class WSClient extends Endpoint {
         this.session.getBasicRemote().sendText(msg);
     }
 
-    public void stop() throws IOException {
+    public void stop() throws IOException, InterruptedException {
+        session.wait(300);
         session.close();
     }
 

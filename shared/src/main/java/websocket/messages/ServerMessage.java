@@ -1,6 +1,6 @@
 package websocket.messages;
 
-import chess.ChessBoard;
+import model.GameData;
 
 import java.util.Objects;
 
@@ -14,7 +14,7 @@ public class ServerMessage {
     ServerMessageType serverMessageType;
     public String errorMessage;
     public String message;
-    public ChessBoard game = null;
+    public GameData game = null;
 
     public enum ServerMessageType {
         LOAD_GAME,

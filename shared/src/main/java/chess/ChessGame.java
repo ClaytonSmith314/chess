@@ -106,7 +106,7 @@ public class ChessGame {
         if (validMoves!=null && validMoves.contains(move)) {
             ChessPiece piece = board.getPiece(move.getStartPosition());
             if(piece.getTeamColor()!=teamTurn) {
-                throw new InvalidMoveException();
+                throw new InvalidMoveException("Error: Not your turn");
             }
             board.addPiece(move.getStartPosition(), null);
             ChessPiece.PieceType promotion = move.getPromotionPiece();
@@ -118,7 +118,7 @@ public class ChessGame {
             findKings();
             teamTurn = (teamTurn==TeamColor.WHITE)? TeamColor.BLACK : TeamColor.WHITE;
         } else {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Error: Invalid move");
         }
     }
 

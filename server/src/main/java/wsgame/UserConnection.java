@@ -1,5 +1,9 @@
 package wsgame;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
@@ -35,6 +39,7 @@ public class UserConnection {
                     connect(userGameCommand);
                 }
                 case MAKE_MOVE -> {
+                    makeMove(userGameCommand);
                 }
                 case LEAVE -> {
                     leave(userGameCommand);
@@ -64,6 +69,57 @@ public class UserConnection {
         sendString(string);
     }
 
+    public void sendNotification(String message) {
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        serverMessage.message = message;
+        send(serverMessage);
+    }
+    public void sendError(String message) {
+        ServerMessage serverMessage = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
+        serverMessage.errorMessage = message;
+        send(serverMessage);
+    }
+
+    private void makeMove(UserGameCommand userGameCommand) throws DataAccessException {
+        AuthDAO authDAO = new SQLAuthDAO();
+        GameDAO gameDAO = new SQLGameDAO();
+        AuthData authData = authDAO.getAuth(userGameCommand.getAuthToken());
+
+        var move = userGameCommand.move;
+        GameData gameData = gameDAO.getGame(userGameCommand.getGameID());
+        ChessBoard board = gameData.game().getBoard();
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+
+        ChessGame.TeamColor team;
+        if(authData.username().equals(gameData.whiteUsername())) {
+            team = ChessGame.TeamColor.WHITE;
+        } else if(authData.username().equals(gameData.blackUsername())) {
+            team = ChessGame.TeamColor.BLACK;
+        } else {
+            sendError("Error: Observers cannot make moves");
+            return;
+        }
+        if(piece==null) {
+            sendError("Error: Start position is empty");
+            return;
+        }
+        if(piece.getTeamColor()!=team) {
+            sendError("Error: piece has wrong team color");
+            return;
+        }
+
+        try {
+            gameData.game().makeMove(move);
+        } catch (InvalidMoveException e) {
+            sendError(e.getMessage());
+            return;
+        }
+
+        gameDAO.updateGame(gameData);
+        gameRoom.broadcastNotification("User "+username+" has made move "+move, null);
+        gameRoom.broadcastGame(gameData, null);
+    }
+
     public void connect(UserGameCommand userGameCommand) throws DataAccessException {
         AuthDAO authDAO = new SQLAuthDAO();
         GameDAO gameDAO = new SQLGameDAO();
@@ -91,7 +147,7 @@ public class UserConnection {
         gameRoom.addUser(this);
 
         ServerMessage message = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME);
-        message.game = gameData.game().getBoard();
+        message.game = gameData;
         send(message);
     }
 

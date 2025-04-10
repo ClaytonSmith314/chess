@@ -6,6 +6,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 public class WSServerFacade {
 
@@ -37,7 +38,7 @@ public class WSServerFacade {
         wsClient.send(msg);
     }
 
-    public void close() throws IOException {
+    public void close() throws IOException, InterruptedException {
         wsClient.stop();
     }
 
