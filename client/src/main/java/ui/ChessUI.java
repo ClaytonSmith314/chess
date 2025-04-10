@@ -185,10 +185,41 @@ public class ChessUI {
             handleBadArgs("move");
             return;
         }
+
+        ChessPiece piece = gameData.game().getBoard().getPiece(startPosition);
+        ChessPiece.PieceType promotion = null;
+        if(piece!=null && piece.getPieceType()==ChessPiece.PieceType.PAWN
+            && (endPosition.getRow()==1 || endPosition.getRow()==8)) {
+            if(args.length!=4) {
+                System.out.println("Error: please specify the promotion piece (one of Q, R, B, Kn)");
+                return;
+            }
+            switch(args[3].charAt(0)) {
+                default -> {
+                    System.out.println("Error: incorrect promotion piece type (should be one of Q, R, B, Kn)");
+                }
+                case 'Q' -> {
+                    promotion = ChessPiece.PieceType.QUEEN;
+                }
+                case 'R' -> {
+                    promotion = ChessPiece.PieceType.ROOK;
+                }
+                case 'B' -> {
+                    promotion = ChessPiece.PieceType.BISHOP;
+                }
+                case 'K' -> {
+                    if(args[3].length()<2 || args[3].charAt(1)!='n') {
+                        System.out.println("Error: incorrect promotion piece type (should be one of Q, R, B, Kn)");
+                    } else {
+                        promotion = ChessPiece.PieceType.KNIGHT;
+                    }
+                }
+            }
+        }
         ChessMove move = new ChessMove(
                 startPosition,
                 endPosition,
-                null
+                promotion
         );
         UserGameCommand command = new UserGameCommand(
                 UserGameCommand.CommandType.MAKE_MOVE,
