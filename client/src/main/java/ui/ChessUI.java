@@ -237,6 +237,10 @@ public class ChessUI {
                     UserGameCommand.CommandType.CONNECT,
                     sessionAuthData.authToken(),
                     gameId);
+            command.userRole = args[2].equals("WHITE")?
+                    UserGameCommand.UserRole.WHITE_PLAYER :
+                    UserGameCommand.UserRole.BLACK_PLAYER;
+            command.username = sessionAuthData.username();
             wsServerFacade.send(command);
             gamePlayMode = true;
             isObserver = false;

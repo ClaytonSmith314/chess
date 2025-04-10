@@ -60,15 +60,15 @@ public class UserConnection {
         GameId gameId = new GameId(userGameCommand.getGameID());
         GameRoom gameRoom = GameRoom.fromGameId(gameId);
         if(gameRoom == null) {
-            gameRoom = new GameRoom(gameId, this, userGameCommand.userRole);
-        } else {
-            gameRoom.addUser(this, userGameCommand.userRole);
+            gameRoom = new GameRoom(gameId, this);
         }
 
         this.myRole = userGameCommand.userRole;
         this.gameRoom = gameRoom;
         this.authToken = userGameCommand.getAuthToken();
         this.username = userGameCommand.username;
+
+        gameRoom.addUser(this, userGameCommand.userRole);
     }
 
     public void authorize() {

@@ -17,13 +17,13 @@ public class GameRoom {
         return gameIdsToGameRoom.get(gameId);
     }
 
-    public GameRoom(GameId gameId, UserConnection rootUser, UserGameCommand.UserRole role) {
+    public GameRoom(GameId gameId, UserConnection rootUser) {
         gameIdsToGameRoom.put(gameId, this);
-        addUser(rootUser, role);
         this.rootUser = rootUser;
+        this.gameId = gameId;
     }
 
-    GameId gameId;
+    private final GameId gameId;
 
     UserConnection rootUser;
 
@@ -36,18 +36,20 @@ public class GameRoom {
 
     public void addUser(UserConnection connection, UserGameCommand.UserRole role) {
         connectedUsers.add(connection);
-        switch (role) {
-            case WHITE_PLAYER -> {
-                whiteUser = connection;
-                broadcastNotification("User "+connection.getUsername()+" joined as the white player.");
-            }
-            case BLACK_PLAYER -> {
-                blackUser = connection;
-                broadcastNotification("User "+connection.getUsername()+" joined as the black player.");
-            }
-            case OBSERVER -> {
-                observers.add(connection);
-                broadcastNotification("User "+connection.getUsername()+" joined as an observer.");
+        if(role!=null) {
+            switch (role) {
+                case WHITE_PLAYER -> {
+                    whiteUser = connection;
+                    broadcastNotification("User " + connection.getUsername() + " joined as the white player.");
+                }
+                case BLACK_PLAYER -> {
+                    blackUser = connection;
+                    broadcastNotification("User " + connection.getUsername() + " joined as the black player.");
+                }
+                case OBSERVER -> {
+                    observers.add(connection);
+                    broadcastNotification("User " + connection.getUsername() + " joined as an observer.");
+                }
             }
         }
     }
